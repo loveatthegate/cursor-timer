@@ -1,0 +1,109 @@
+<view class="page">
+  <view class="card">
+    <view class="card-title">倒计时时长</view>
+    <view class="hms">
+      <view class="unit" wx:for="{{units}}" wx:key="key">
+        <view class="unit-label">{{item.label}}</view>
+        <view class="stepper">
+          <view class="step-btn" hover-class="btn-hover" data-key="{{item.key}}" data-dir="1" bindtap="onStep">＋</view>
+          <text class="step-val">{{settings[item.key]}}</text>
+          <view class="step-btn" hover-class="btn-hover" data-key="{{item.key}}" data-dir="-1" bindtap="onStep">－</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">提示方式</view>
+    <view class="seg">
+      <view
+        wx:for="{{modes}}"
+        wx:key="value"
+        class="seg-item {{settings.alertMode === item.value ? 'active' : ''}}"
+        hover-class="btn-hover"
+        data-value="{{item.value}}"
+        bindtap="onMode"
+      >{{item.label}}</view>
+    </view>
+
+    <view class="field">
+      <view class="field-label">提示持续（秒）</view>
+      <slider
+        min="1"
+        max="60"
+        step="1"
+        value="{{settings.alertDuration}}"
+        activeColor="#ffc74a"
+        backgroundColor="#e5f3f8"
+        block-size="20"
+        bindchanging="onDurationChanging"
+        bindchange="onDurationChange"
+      />
+      <view class="field-value">{{settings.alertDuration}} 秒</view>
+    </view>
+
+    <view class="field">
+      <view class="field-label">音量</view>
+      <slider
+        min="0"
+        max="100"
+        step="1"
+        value="{{settings.volume}}"
+        activeColor="#ffc74a"
+        backgroundColor="#e5f3f8"
+        block-size="20"
+        bindchanging="onVolumeChanging"
+        bindchange="onVolumeChange"
+      />
+      <view class="field-value sun">{{settings.volume}}%</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">语音与音乐</view>
+
+    <view class="field">
+      <view class="field-label">内置音乐</view>
+      <picker mode="selector" range="{{musicLabels}}" value="{{musicIndex}}" bindchange="onMusicChange">
+        <view class="picker">{{musicLabels[musicIndex]}} ›</view>
+      </picker>
+    </view>
+
+    <view class="field">
+      <view class="field-label">语音文案</view>
+      <textarea
+        class="textarea"
+        maxlength="80"
+        value="{{settings.voiceText}}"
+        bindinput="onVoiceInput"
+        placeholder="时间到啦，起来伸个懒腰吧～"
+      />
+    </view>
+
+    <view class="field">
+      <view class="field-label">语速 {{rateText}}</view>
+      <slider
+        min="5"
+        max="15"
+        step="1"
+        value="{{rateSlider}}"
+        activeColor="#ffc74a"
+        backgroundColor="#e5f3f8"
+        block-size="20"
+        bindchanging="onRateChanging"
+        bindchange="onRateChange"
+      />
+    </view>
+
+    <label class="check">
+      <switch checked="{{settings.repeatVoice}}" color="#ffc74a" bindchange="onRepeatChange" />
+      <text>提醒时温柔地多说几遍</text>
+    </label>
+  </view>
+
+  <view class="actions">
+    <button class="btn btn-secondary" hover-class="btn-hover" bindtap="onTest">先听一下 ♪</button>
+    <button class="btn btn-primary" hover-class="btn-hover" bindtap="onSave">保存这些小设定</button>
+  </view>
+  <view class="hint">提示音默认响 10 秒后自动停止。小程序内语音以文字气泡 + 震动呈现，并播放内置提示旋律。</view>
+</view>

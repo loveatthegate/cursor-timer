@@ -1,0 +1,65 @@
+<view class="page">
+  <view class="decor sun"></view>
+  <view class="decor mint"></view>
+  <view class="cloud"></view>
+
+  <view class="top">
+    <view class="brand">
+      <view class="title">阳光<text class="accent">小倒计时</text></view>
+      <view class="tagline">{{tagline}}</view>
+    </view>
+    <view class="gear" hover-class="btn-hover" bindtap="goSettings">⚙️</view>
+  </view>
+
+  <view class="stage {{alerting ? 'alerting' : ''}}">
+    <view class="ring-wrap">
+      <view class="ring-bg"></view>
+      <view class="ring-fill" style="background: conic-gradient({{ringColor}} {{progressDeg}}deg, #e5f3f8 0deg);"></view>
+      <view class="ring-center">
+        <text class="display {{displayClass}}">{{display}}</text>
+      </view>
+    </view>
+    <view class="status {{statusClass}}">{{status}}</view>
+    <view class="controls">
+      <button class="btn btn-primary" hover-class="btn-hover" disabled="{{running}}" bindtap="onStart">{{startLabel}}</button>
+      <button class="btn btn-secondary" hover-class="btn-hover" disabled="{{!running}}" bindtap="onPause">暂停</button>
+      <button class="btn btn-secondary" hover-class="btn-hover" bindtap="onReset">重置</button>
+      <button wx:if="{{alerting}}" class="btn btn-danger" hover-class="btn-hover" bindtap="onStopAlert">停止提示</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">快捷时长</view>
+    <view class="chips">
+      <view
+        wx:for="{{presets}}"
+        wx:key="sec"
+        class="chip {{activePreset === item.sec ? 'active' : ''}}"
+        hover-class="btn-hover"
+        data-sec="{{item.sec}}"
+        bindtap="onPreset"
+      >{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="settings-entry" hover-class="btn-hover" bindtap="goSettings">
+    <view>
+      <view class="settings-title">提示设置</view>
+      <view class="settings-desc">语音 · 音乐 · 时长 · 音量</view>
+    </view>
+    <text class="chevron">›</text>
+  </view>
+
+  <view wx:if="{{alerting}}" class="alert-card">
+    <view class="alert-row">
+      <text class="l">{{voiceBubble || '提醒小铃声响起中'}}</text>
+      <text class="r">{{alertRemainText}}</text>
+    </view>
+    <view class="bar">
+      <view class="bar-fill" style="width: {{alertProgress}}%;"></view>
+    </view>
+    <view class="alert-hint">{{alertHint}}</view>
+  </view>
+
+  <view wx:if="{{toastVisible}}" class="toast">{{toastText}}</view>
+</view>

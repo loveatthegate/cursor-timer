@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarTitleText": "阳光小倒计时",
+    "navigationBarBackgroundColor": "#edf7ff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#edf7ff",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

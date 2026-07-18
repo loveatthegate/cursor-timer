@@ -1,0 +1,69 @@
+page {
+  --sky: #edf7ff;
+  --sun: #ffc74a;
+  --sun-deep: #f0a820;
+  --mint: #61d1b0;
+  --coral: #ff8b7d;
+  --text: #384a50;
+  --muted: #7a9096;
+  --card: #ffffff;
+  --stroke: #b8dbe6;
+  background: var(--sky);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  line-height: inherit;
+  font-weight: inherit;
+}
+button::after {
+  border: none;
+}
+button[disabled] {
+  opacity: 0.4 !important;
+  color: inherit !important;
+  background: inherit !important;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  padding: 0 44rpx;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #ffd36a, #ffc74a);
+  color: #4a3808;
+  box-shadow: 0 12rpx 28rpx rgba(255, 199, 74, 0.35);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #384a50;
+  border: 2rpx solid #b8dbe6;
+  box-shadow: 0 10rpx 24rpx rgba(120, 175, 200, 0.12);
+}
+
+.btn-danger {
+  background: rgba(255, 139, 125, 0.16);
+  color: #c44a40;
+  border: 2rpx solid rgba(255, 139, 125, 0.55);
+}
+
+.btn-hover {
+  opacity: 0.88;
+  transform: scale(0.97);
+}

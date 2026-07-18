@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#edf7ff" />
+  <title>阳光小倒计时</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sky: #edf7ff;
+      --sky-2: #dff1fb;
+      --sun: #ffc74a;
+      --sun-deep: #f0a820;
+      --mint: #61d1b0;
+      --coral: #ff8b7d;
+      --text: #384a50;
+      --muted: #7a9096;
+      --card: #ffffff;
+      --stroke: #b8dbe6;
+      --shadow: 0 12px 28px rgba(120, 175, 200, 0.18);
+      --radius: 28px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --safe-t: env(safe-area-inset-top, 0px);
+      --font: "Nunito", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--sky);
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    .phone {
+      position: relative;
+      height: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding: calc(12px + var(--safe-t)) 18px calc(16px + var(--safe-b));
+      overflow: hidden;
+      background:
+        radial-gradient(160px 160px at 92% 4%, rgba(255, 199, 74, 0.55), transparent 70%),
+        radial-gradient(200px 200px at -10% 88%, rgba(97, 209, 176, 0.35), transparent 70%),
+        linear-gradient(180deg, #f4fbff 0%, var(--sky) 45%, #e8f6f2 100%);
+    }
+
+    .cloud {
+      position: absolute;
+      width: 78px;
+      height: 42px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      top: calc(64px + var(--safe-t));
+      left: 22px;
+      filter: blur(0.2px);
+      pointer-events: none;
+      animation: floaty 6s ease-in-out infinite;
+    }
+    .cloud::before, .cloud::after {
+      content: "";
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .cloud::before { width: 36px; height: 36px; left: 10px; top: -16px; }
+    .cloud::after { width: 46px; height: 46px; right: 8px; top: -20px; }
+
+    .top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      animation: rise 0.55s ease both;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .brand h1 span { color: var(--sun-deep); }
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid var(--stroke);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+    .icon-btn:active { transform: scale(0.94); }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      background: var(--card);
+      border: 1.5px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      animation: rise 0.6s 0.05s ease both;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .stage.alerting {
+      box-shadow: 0 14px 36px rgba(255, 139, 125, 0.28);
+      animation: softPulse 1.1s ease-in-out infinite;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: min(72vw, 260px);
+      height: min(72vw, 260px);
+      display: grid;
+      place-items: center;
+    }
+    .ring-wrap svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .ring-track { stroke: #e5f3f8; fill: none; stroke-width: 10; }
+    .ring-prog {
+      stroke: var(--mint);
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.2s linear, stroke 0.3s ease;
+    }
+    .ring-prog.urgent { stroke: var(--coral); }
+    .ring-prog.done { stroke: var(--sun); }
+
+    .display {
+      position: relative;
+      font-family: var(--mono);
+      font-size: clamp(2.2rem, 9vw, 2.85rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      transition: color 0.25s ease, transform 0.2s ease;
+    }
+    .display.urgent { color: var(--coral); }
+    .display.done { color: var(--sun-deep); }
+
+    .status {
+      min-height: 1.25em;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .status.ok { color: var(--mint); }
+    .status.hot { color: var(--coral); }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      border-radius: 999px;
+      min-height: 48px;
+      padding: 0.85rem 1.35rem;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s;
+      touch-action: manipulation;
+    }
+    button:active { transform: scale(0.96); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #ffd36a, var(--sun));
+      color: #4a3808;
+      box-shadow: 0 8px 18px rgba(255, 199, 74, 0.4);
+      min-width: 132px;
+    }
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1.5px solid var(--stroke);
+      box-shadow: var(--shadow);
+    }
+    .btn-danger {
+      background: rgba(255, 139, 125, 0.16);
+      color: #c44a40;
+      border: 1.5px solid rgba(255, 139, 125, 0.55);
+    }
+
+    .section {
+      position: relative;
+      z-index: 1;
+      margin-top: 16px;
+      animation: rise 0.65s 0.1s ease both;
+    }
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      border: 1.5px solid var(--stroke);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      min-height: 40px;
+      padding: 0.55rem 0.95rem;
+      font-weight: 700;
+      font-size: 0.88rem;
+      box-shadow: 0 6px 14px rgba(120, 175, 200, 0.12);
+    }
+    .chip.active {
+      background: var(--sun);
+      border-color: transparent;
+      color: #4a3808;
+    }
+
+    .settings-entry {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #fff8e8;
+      border: 1.5px solid #f3d89a;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      animation: rise 0.7s 0.14s ease both;
+    }
+    .settings-entry:active { transform: scale(0.98); }
+    .settings-entry strong {
+      display: block;
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--sun-deep);
+    }
+    .settings-entry span {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .chevron {
+      color: var(--sun-deep);
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .alert-card {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: #fff1ee;
+      border: 1.5px solid #ffc4bc;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      animation: rise 0.35s ease both;
+    }
+    .alert-card.show { display: block; }
+    .alert-card .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .alert-card .row .l { color: var(--coral); }
+    .alert-card .row .r { color: var(--muted); font-weight: 700; }
+    .bar {
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.8);
+      overflow: hidden;
+    }
+    .bar > i {
+      display: block;
+      height: 100%;
+      width: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--sun), var(--coral));
+      transform-origin: left center;
+      transform: scaleX(1);
+    }
+    .alert-card .hint {
+      margin: 8px 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* Bottom sheet */
+    .sheet-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(56, 74, 80, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 40;
+    }
+    .sheet-mask.open { opacity: 1; pointer-events: auto; }
+
+    .sheet {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 110%);
+      width: min(100%, 430px);
+      max-height: min(88vh, 720px);
+      background: #f7fbff;
+      border-radius: 28px 28px 0 0;
+      box-shadow: 0 -12px 40px rgba(80, 130, 160, 0.2);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      padding-bottom: var(--safe-b);
+    }
+    .sheet.open { transform: translate(-50%, 0); }
+    .sheet-handle {
+      width: 42px;
+      height: 5px;
+      border-radius: 99px;
+      background: #c9dde6;
+      margin: 10px auto 6px;
+    }
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 18px 12px;
+    }
+    .sheet-head h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .sheet-body {
+      overflow: auto;
+      padding: 0 18px 18px;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .card {
+      background: #fff;
+      border: 1.5px solid var(--stroke);
+      border-radius: 22px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 18px rgba(120, 175, 200, 0.1);
+    }
+    .card h4 {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+    .hms {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .hms label {
+      display: grid;
+      gap: 6px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .stepper {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 4px;
+      background: #e8f8f3;
+      border: 1.5px solid var(--stroke);
+      border-radius: 16px;
+      padding: 6px;
+    }
+    .stepper button {
+      min-height: 36px;
+      padding: 0;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--stroke);
+      color: var(--text);
+      font-size: 1.1rem;
+      box-shadow: none;
+    }
+    .stepper input {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .field:last-child { margin-bottom: 0; }
+    .field > span {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    select, textarea, input[type="number"], input[type="range"] {
+      width: 100%;
+      border: 1.5px solid var(--stroke);
+      background: #eef8fc;
+      border-radius: 14px;
+      padding: 0.75rem 0.85rem;
+      font: inherit;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    input[type="range"] {
+      padding: 0;
+      height: 0.45rem;
+      accent-color: var(--sun);
+      background: transparent;
+    }
+    .seg {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .seg button {
+      min-height: 40px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.85rem;
+      background: #fff;
+      border: 1.5px solid var(--stroke);
+      color: var(--text);
+      box-shadow: none;
+    }
+    .seg button.active {
+      background: var(--sun);
+      border-color: transparent;
+      color: #4a3808;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 4px;
+    }
+    .check input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--sun);
+    }
+    .sheet-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .hint {
+      margin: 10px 0 0;
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(28px + var(--safe-b));
+      transform: translate(-50%, 20px);
+      background: rgba(56, 74, 80, 0.92);
+      color: #fff;
+      padding: 0.7rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 80;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+    @keyframes softPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.01); }
+    }
+
+    @media (min-width: 768px) {
+      body { display: grid; place-items: center; }
+      .phone {
+        height: min(900px, 100vh);
+        border-radius: 36px;
+        border: 1.5px solid var(--stroke);
+        box-shadow: 0 24px 60px rgba(120, 175, 200, 0.25);
+        margin: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" id="app">
+    <div class="cloud" aria-hidden="true"></div>
+
+    <header class="top">
+      <div class="brand">
+        <h1>阳光<span>小倒计时</span></h1>
+        <p id="tagline">温柔提醒你 · 专注也要轻松</p>
+      </div>
+      <button class="icon-btn" id="btnOpenSettings" type="button" aria-label="打开设置">⚙️</button>
+    </header>
+
+    <section class="stage" id="stage">
+      <div class="ring-wrap" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-prog" id="ring" cx="60" cy="60" r="52"
+            stroke-dasharray="326.73" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="display" id="display">00:05:00</div>
+      </div>
+      <div class="status ok" id="status">准备好啦 ✓</div>
+      <div class="controls">
+        <button class="btn-primary" id="btnStart" type="button">开始</button>
+        <button class="btn-secondary" id="btnPause" type="button" disabled>暂停</button>
+        <button class="btn-secondary" id="btnReset" type="button">重置</button>
+        <button class="btn-danger" id="btnStopAlert" type="button" hidden>停止提示</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>快捷时长</h2>
+      <div class="chips" id="chips">
+        <button class="chip" type="button" data-preset="60">1 分钟</button>
+        <button class="chip active" type="button" data-preset="300">5 分钟</button>
+        <button class="chip" type="button" data-preset="600">10 分钟</button>
+        <button class="chip" type="button" data-preset="1500">25 分钟</button>
+        <button class="chip" type="button" data-preset="3600">1 小时</button>
+      </div>
+    </section>
+
+    <div class="settings-entry" id="settingsEntry" role="button" tabindex="0">
+      <div>
+        <strong>提示设置</strong>
+        <span>语音 · 音乐 · 时长 · 音量</span>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="alert-card" id="alertCard">
+      <div class="row">
+        <span class="l">提醒小铃声响起中</span>
+        <span class="r" id="alertRemain">10 秒后安静下来</span>
+      </div>
+      <div class="bar"><i id="alertBar"></i></div>
+      <p class="hint" id="alertHint">语音 + 音乐 · 温柔提醒</p>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="sheetMask"></div>
+  <aside class="sheet" id="sheet" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>温柔设置</h3>
+      <button class="btn-secondary" id="btnCloseSheet" type="button" style="min-height:40px;padding:0.45rem 0.9rem;">完成</button>
+    </div>
+    <div class="sheet-body">
+      <div class="card">
+        <h4>倒计时时长</h4>
+        <div class="hms">
+          <label>小时
+            <div class="stepper">
+              <button type="button" data-step="hours" data-dir="1">＋</button>
+              <input id="hours" type="number" min="0" max="99" value="0" inputmode="numeric" />
+              <button type="button" data-step="hours" data-dir="-1">－</button>
+            </div>
+          </label>
+          <label>分钟
+            <div class="stepper">
+              <button type="button" data-step="minutes" data-dir="1">＋</button>
+              <input id="minutes" type="number" min="0" max="59" value="5" inputmode="numeric" />
+              <button type="button" data-step="minutes" data-dir="-1">－</button>
+            </div>
+          </label>
+          <label>秒
+            <div class="stepper">
+              <button type="button" data-step="seconds" data-dir="1">＋</button>
+              <input id="seconds" type="number" min="0" max="59" value="0" inputmode="numeric" />
+              <button type="button" data-step="seconds" data-dir="-1">－</button>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>提示方式</h4>
+        <div class="seg" id="alertModeSeg">
+          <button type="button" data-mode="both" class="active">语音 + 音乐</button>
+          <button type="button" data-mode="voice">仅语音</button>
+          <button type="button" data-mode="music">仅音乐</button>
+        </div>
+        <label class="field" style="margin-top:12px;">
+          <span>提示持续（秒）</span>
+          <input id="alertDuration" type="number" min="1" max="120" value="10" inputmode="numeric" />
+        </label>
+        <label class="field">
+          <span>音量 <strong id="volumeLabel" style="color:var(--sun-deep)">70%</strong></span>
+          <input id="volume" type="range" min="0" max="100" value="70" />
+        </label>
+      </div>
+
+      <div class="card">
+        <h4>语音与音乐</h4>
+        <label class="field">
+          <span>内置音乐</span>
+          <select id="musicStyle">
+            <option value="chime">阳光钟声</option>
+            <option value="pulse">轻快脉冲</option>
+            <option value="ascending">上行音阶</option>
+            <option value="alarm">活泼提醒</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>语音语言</span>
+          <select id="voiceLang">
+            <option value="zh-CN">中文</option>
+            <option value="en-US">English</option>
+            <option value="ja-JP">日本語</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>语速 <strong id="rateLabel" style="color:var(--sun-deep)">1.0</strong></span>
+          <input id="voiceRate" type="range" min="0.5" max="1.5" step="0.1" value="1" />
+        </label>
+        <label class="field">
+          <span>语音文案</span>
+          <textarea id="voiceText">时间到啦，起来伸个懒腰吧～</textarea>
+        </label>
+        <label class="check">
+          <input id="repeatVoice" type="checkbox" checked />
+          提醒时温柔地多说几遍
+        </label>
+      </div>
+
+      <div class="sheet-actions">
+        <button class="btn-secondary" id="btnTestAlert" type="button">先听一下 ♪</button>
+        <button class="btn-primary" id="btnSaveSettings" type="button">保存这些小设定</button>
+      </div>
+      <p class="hint">提示音默认响 10 秒后自动停止，可在上方修改。设置会保存在本机。</p>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "sunny-timer-mobile-v1";
+      const RING = 2 * Math.PI * 52;
+
+      const els = {
+        stage: document.getElementById("stage"),
+        display: document.getElementById("display"),
+        status: document.getElementById("status"),
+        tagline: document.getElementById("tagline"),
+        ring: document.getElementById("ring"),
+        btnStart: document.getElementById("btnStart"),
+        btnPause: document.getElementById("btnPause"),
+        btnReset: document.getElementById("btnReset"),
+        btnStopAlert: document.getElementById("btnStopAlert"),
+        chips: document.getElementById("chips"),
+        settingsEntry: document.getElementById("settingsEntry"),
+        btnOpenSettings: document.getElementById("btnOpenSettings"),
+        sheet: document.getElementById("sheet"),
+        sheetMask: document.getElementById("sheetMask"),
+        btnCloseSheet: document.getElementById("btnCloseSheet"),
+        hours: document.getElementById("hours"),
+        minutes: document.getElementById("minutes"),
+        seconds: document.getElementById("seconds"),
+        alertDuration: document.getElementById("alertDuration"),
+        volume: document.getElementById("volume"),
+        volumeLabel: document.getElementById("volumeLabel"),
+        musicStyle: document.getElementById("musicStyle"),
+        voiceLang: document.getElementById("voiceLang"),
+        voiceRate: document.getElementById("voiceRate"),
+        rateLabel: document.getElementById("rateLabel"),
+        voiceText: document.getElementById("voiceText"),
+        repeatVoice: document.getElementById("repeatVoice"),
+        alertModeSeg: document.getElementById("alertModeSeg"),
+        btnTestAlert: document.getElementById("btnTestAlert"),
+        btnSaveSettings: document.getElementById("btnSaveSettings"),
+        alertCard: document.getElementById("alertCard"),
+        alertBar: document.getElementById("alertBar"),
+        alertRemain: document.getElementById("alertRemain"),
+        alertHint: document.getElementById("alertHint"),
+        toast: document.getElementById("toast"),
+      };
+
+      const state = {
+        totalMs: 300000,
+        remainingMs: 300000,
+        running: false,
+        alerting: false,
+        endAt: 0,
+        tickId: null,
+        alertStopId: null,
+        alertTickId: null,
+        voiceLoopId: null,
+        audioCtx: null,
+        oscillators: [],
+        alertMode: "both",
+        alertStartedAt: 0,
+      };
+
+      const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+      const pad = (n) => String(n).padStart(2, "0");
+
+      function formatMs(ms) {
+        const total = Math.max(0, Math.ceil(ms / 1000));
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        const s = total % 60;
+        return `${pad(h)}:${pad(m)}:${pad(s)}`;
+      }
+
+      function buzz(ms = 12) {
+        try { navigator.vibrate?.(ms); } catch (_) {}
+      }
+
+      function toast(msg) {
+        els.toast.textContent = msg;
+        els.toast.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => els.toast.classList.remove("show"), 1600);
+      }
+
+      function setStatus(text, kind = "") {
+        els.status.textContent = text;
+        els.status.className = "status" + (kind ? ` ${kind}` : "");
+      }
+
+      function readDurationMs() {
+        const h = clamp(parseInt(els.hours.value, 10) || 0, 0, 99);
+        const m = clamp(parseInt(els.minutes.value, 10) || 0, 0, 59);
+        const s = clamp(parseInt(els.seconds.value, 10) || 0, 0, 59);
+        els.hours.value = h;
+        els.minutes.value = m;
+        els.seconds.value = s;
+        return ((h * 3600) + (m * 60) + s) * 1000;
+      }
+
+      function updateRing() {
+        const ratio = state.totalMs > 0 ? state.remainingMs / state.totalMs : 0;
+        els.ring.style.strokeDasharray = String(RING);
+        els.ring.style.strokeDashoffset = String(RING * (1 - ratio));
+        els.ring.classList.toggle("urgent", state.running && state.remainingMs <= 10000 && state.remainingMs > 0);
+        els.ring.classList.toggle("done", state.alerting || state.remainingMs <= 0);
+      }
+
+      function updateDisplay() {
+        els.display.textContent = formatMs(state.remainingMs);
+        els.display.classList.toggle("urgent", state.running && state.remainingMs <= 10000 && state.remainingMs > 0);
+        els.display.classList.toggle("done", state.alerting || (!state.running && state.remainingMs === 0));
+        updateRing();
+      }
+
+      function syncDurationFromInputs() {
+        if (state.running || state.alerting) return;
+        state.totalMs = readDurationMs();
+        state.remainingMs = state.totalMs;
+        updateDisplay();
+        highlightPreset(state.totalMs / 1000);
+        if (state.totalMs <= 0) setStatus("先设置一个时长哦", "hot");
+        else setStatus("准备好啦 ✓", "ok");
+      }
+
+      function highlightPreset(sec) {
+        [...els.chips.querySelectorAll(".chip")].forEach((btn) => {
+          btn.classList.toggle("active", Number(btn.dataset.preset) === sec);
+        });
+      }
+
+      function getSettings() {
+        return {
+          hours: clamp(parseInt(els.hours.value, 10) || 0, 0, 99),
+          minutes: clamp(parseInt(els.minutes.value, 10) || 0, 0, 59),
+          seconds: clamp(parseInt(els.seconds.value, 10) || 0, 0, 59),
+          alertMode: state.alertMode,
+          alertDuration: clamp(parseInt(els.alertDuration.value, 10) || 10, 1, 120),
+          volume: clamp(parseInt(els.volume.value, 10) || 0, 0, 100),
+          musicStyle: els.musicStyle.value,
+          voiceText: els.voiceText.value.trim() || "时间到啦，起来伸个懒腰吧～",
+          voiceLang: els.voiceLang.value,
+          voiceRate: clamp(parseFloat(els.voiceRate.value) || 1, 0.5, 1.5),
+          repeatVoice: els.repeatVoice.checked,
+        };
+      }
+
+      function applySettings(data) {
+        if (!data) return;
+        els.hours.value = data.hours ?? 0;
+        els.minutes.value = data.minutes ?? 5;
+        els.seconds.value = data.seconds ?? 0;
+        state.alertMode = data.alertMode || "both";
+        [...els.alertModeSeg.querySelectorAll("button")].forEach((b) => {
+          b.classList.toggle("active", b.dataset.mode === state.alertMode);
+        });
+        els.alertDuration.value = data.alertDuration ?? 10;
+        els.volume.value = data.volume ?? 70;
+        els.volumeLabel.textContent = `${els.volume.value}%`;
+        els.musicStyle.value = data.musicStyle || "chime";
+        els.voiceText.value = data.voiceText || "时间到啦，起来伸个懒腰吧～";
+        els.voiceLang.value = data.voiceLang || "zh-CN";
+        els.voiceRate.value = data.voiceRate ?? 1;
+        els.rateLabel.textContent = Number(els.voiceRate.value).toFixed(1);
+        els.repeatVoice.checked = data.repeatVoice !== false;
+        syncDurationFromInputs();
+      }
+
+      function saveSettings() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(getSettings())); } catch (_) {}
+      }
+
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) applySettings(JSON.parse(raw));
+          else syncDurationFromInputs();
+        } catch (_) {
+          syncDurationFromInputs();
+        }
+      }
+
+      function openSheet() {
+        els.sheet.classList.add("open");
+        els.sheetMask.classList.add("open");
+        els.sheet.setAttribute("aria-hidden", "false");
+        buzz(8);
+      }
+
+      function closeSheet() {
+        els.sheet.classList.remove("open");
+        els.sheetMask.classList.remove("open");
+        els.sheet.setAttribute("aria-hidden", "true");
+        syncDurationFromInputs();
+        saveSettings();
+      }
+
+      function ensureAudioCtx() {
+        if (!state.audioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          state.audioCtx = new Ctx();
+        }
+        if (state.audioCtx.state === "suspended") state.audioCtx.resume();
+        return state.audioCtx;
+      }
+
+      function stopBuiltInMusic() {
+        state.oscillators.forEach((n) => {
+          try { n.stop(); } catch (_) {}
+          try { n.disconnect(); } catch (_) {}
+        });
+        state.oscillators = [];
+      }
+
+      function stopVoice() {
+        window.speechSynthesis?.cancel();
+        if (state.voiceLoopId) {
+          clearInterval(state.voiceLoopId);
+          state.voiceLoopId = null;
+        }
+      }
+
+      function stopAlert({ keepUi = false } = {}) {
+        stopBuiltInMusic();
+        stopVoice();
+        if (state.alertStopId) clearTimeout(state.alertStopId);
+        if (state.alertTickId) clearInterval(state.alertTickId);
+        state.alertStopId = null;
+        state.alertTickId = null;
+        state.alerting = false;
+        els.stage.classList.remove("alerting");
+        els.btnStopAlert.hidden = true;
+        els.alertCard.classList.remove("show");
+        els.alertBar.style.transform = "scaleX(0)";
+        if (!keepUi && !state.running) {
+          setStatus(state.remainingMs <= 0 ? "时间到啦 · 提示已停下" : "已停止提示", "ok");
+          els.tagline.textContent = "温柔提醒你 · 专注也要轻松";
+        }
+      }
+
+      function speakOnce(text, lang, rate, volume) {
+        if (!window.speechSynthesis) return;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = lang;
+        utter.rate = rate;
+        utter.volume = volume;
+        const voices = window.speechSynthesis.getVoices();
+        const match = voices.find((v) => v.lang === lang) || voices.find((v) => v.lang.startsWith(lang.slice(0, 2)));
+        if (match) utter.voice = match;
+        window.speechSynthesis.speak(utter);
+      }
+
+      function startVoiceAlert(settings) {
+        if (!window.speechSynthesis) return;
+        const vol = settings.volume / 100;
+        const speak = () => speakOnce(settings.voiceText, settings.voiceLang, settings.voiceRate, vol);
+        speak();
+        if (settings.repeatVoice) {
+          const interval = clamp(Math.round(2400 / settings.voiceRate), 1500, 4200);
+          state.voiceLoopId = setInterval(speak, interval);
+        }
+      }
+
+      function playPattern(ctx, style, durationSec, volume) {
+        const now = ctx.currentTime;
+        const end = now + durationSec;
+        const master = ctx.createGain();
+        master.gain.value = volume;
+        master.connect(ctx.destination);
+
+        const beep = (freq, start, len, type = "sine", gain = 0.24) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = type;
+          osc.frequency.value = freq;
+          g.gain.setValueAtTime(0.0001, start);
+          g.gain.exponentialRampToValueAtTime(gain, start + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, start + len);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(start);
+          osc.stop(start + len + 0.02);
+          state.oscillators.push(osc);
+        };
+
+        if (style === "pulse") {
+          for (let t = now; t < end; t += 0.9) {
+            beep(440, t, 0.32, "triangle", 0.22);
+            beep(554.37, t + 0.34, 0.32, "triangle", 0.18);
+          }
+          return;
+        }
+        if (style === "ascending") {
+          const notes = [261.63, 329.63, 392, 523.25, 659.25];
+          let i = 0;
+          for (let t = now; t < end; t += 0.34) {
+            beep(notes[i % notes.length], t, 0.26, "sine", 0.22);
+            i += 1;
+          }
+          return;
+        }
+        if (style === "alarm") {
+          for (let t = now; t < end; t += 0.55) {
+            beep(784, t, 0.16, "square", 0.14);
+            beep(988, t + 0.2, 0.16, "square", 0.12);
+          }
+          return;
+        }
+        // chime default
+        for (let t = now; t < end; t += 1.55) {
+          [523.25, 659.25, 783.99].forEach((f, i) => beep(f, t + i * 0.16, 0.5, "sine", 0.24));
+        }
+      }
+
+      function startMusicAlert(settings) {
+        const ctx = ensureAudioCtx();
+        playPattern(ctx, settings.musicStyle, settings.alertDuration, settings.volume / 100);
+      }
+
+      function modeLabel(mode) {
+        if (mode === "voice") return "仅语音 · 温柔提醒";
+        if (mode === "music") return "仅音乐 · 温柔提醒";
+        return "语音 + 音乐 · 温柔提醒";
+      }
+
+      function startAlert(isTest = false) {
+        stopAlert({ keepUi: true });
+        const settings = getSettings();
+        saveSettings();
+        state.alerting = true;
+        state.alertStartedAt = Date.now();
+        els.stage.classList.add("alerting");
+        els.btnStopAlert.hidden = false;
+        els.alertCard.classList.add("show");
+        els.alertHint.textContent = modeLabel(settings.alertMode);
+        els.tagline.textContent = isTest ? "试听中 · 听听舒不舒服" : "时间到啦 · 休息一下吧";
+        setStatus(isTest ? `试听中 · ${settings.alertDuration} 秒` : `叮咚 · 时间到啦（${settings.alertDuration} 秒）`, "hot");
+        buzz([30, 40, 30]);
+
+        if (settings.alertMode === "voice" || settings.alertMode === "both") startVoiceAlert(settings);
+        if (settings.alertMode === "music" || settings.alertMode === "both") startMusicAlert(settings);
+
+        const updateAlertUi = () => {
+          const elapsed = Date.now() - state.alertStartedAt;
+          const total = settings.alertDuration * 1000;
+          const left = Math.max(0, total - elapsed);
+          const ratio = Math.max(0, left / total);
+          els.alertBar.style.transform = `scaleX(${ratio})`;
+          els.alertRemain.textContent = `${Math.ceil(left / 1000)} 秒后安静下来`;
+        };
+        updateAlertUi();
+        state.alertTickId = setInterval(updateAlertUi, 100);
+
+        state.alertStopId = setTimeout(() => {
+          stopAlert();
+          setStatus(isTest ? "试听结束啦" : "时间到啦 · 提示已自动停下", "ok");
+          updateDisplay();
+          toast(isTest ? "试听完成" : "提示已自动停止");
+        }, settings.alertDuration * 1000);
+      }
+
+      function tick() {
+        if (!state.running) return;
+        state.remainingMs = Math.max(0, state.endAt - Date.now());
+        updateDisplay();
+        if (state.remainingMs <= 0) {
+          state.running = false;
+          clearInterval(state.tickId);
+          state.tickId = null;
+          els.btnStart.disabled = false;
+          els.btnPause.disabled = true;
+          els.btnStart.textContent = "开始";
+          startAlert(false);
+        }
+      }
+
+      function startTimer() {
+        const ms = state.running ? state.remainingMs : readDurationMs();
+        if (ms <= 0) {
+          setStatus("先设置一个时长哦", "hot");
+          toast("时长要大于 0");
+          buzz(20);
+          return;
+        }
+        stopAlert({ keepUi: true });
+        ensureAudioCtx();
+        if (!state.running) {
+          state.totalMs = ms;
+          state.remainingMs = ms;
+        }
+        state.running = true;
+        state.endAt = Date.now() + state.remainingMs;
+        els.btnStart.disabled = true;
+        els.btnPause.disabled = false;
+        els.btnStart.textContent = "开始";
+        setStatus("计时中… 加油", "ok");
+        els.tagline.textContent = "专注进行中 · 加油呀";
+        updateDisplay();
+        clearInterval(state.tickId);
+        state.tickId = setInterval(tick, 100);
+        tick();
+        saveSettings();
+        buzz(10);
+      }
+
+      function pauseTimer() {
+        if (!state.running) return;
+        state.running = false;
+        state.remainingMs = Math.max(0, state.endAt - Date.now());
+        clearInterval(state.tickId);
+        state.tickId = null;
+        els.btnStart.disabled = false;
+        els.btnPause.disabled = true;
+        els.btnStart.textContent = "继续";
+        setStatus("先歇一会儿");
+        els.tagline.textContent = "随时可以继续哦";
+        updateDisplay();
+        buzz(8);
+      }
+
+      function resetTimer() {
+        stopAlert();
+        state.running = false;
+        clearInterval(state.tickId);
+        state.tickId = null;
+        state.totalMs = readDurationMs();
+        state.remainingMs = state.totalMs;
+        els.btnStart.disabled = false;
+        els.btnPause.disabled = true;
+        els.btnStart.textContent = "开始";
+        setStatus(state.totalMs > 0 ? "已重置啦" : "先设置一个时长哦", state.totalMs > 0 ? "ok" : "hot");
+        els.tagline.textContent = "温柔提醒你 · 专注也要轻松";
+        updateDisplay();
+        highlightPreset(state.totalMs / 1000);
+        saveSettings();
+        buzz(8);
+      }
+
+      // Events
+      els.btnStart.addEventListener("click", startTimer);
+      els.btnPause.addEventListener("click", pauseTimer);
+      els.btnReset.addEventListener("click", resetTimer);
+      els.btnStopAlert.addEventListener("click", () => {
+        stopAlert();
+        toast("已停止提示");
+        buzz(10);
+      });
+
+      els.chips.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-preset]");
+        if (!btn || state.running || state.alerting) return;
+        const total = Number(btn.dataset.preset);
+        els.hours.value = Math.floor(total / 3600);
+        els.minutes.value = Math.floor((total % 3600) / 60);
+        els.seconds.value = total % 60;
+        syncDurationFromInputs();
+        saveSettings();
+        buzz(8);
+      });
+
+      els.settingsEntry.addEventListener("click", openSheet);
+      els.settingsEntry.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") openSheet();
+      });
+      els.btnOpenSettings.addEventListener("click", openSheet);
+      els.btnCloseSheet.addEventListener("click", () => {
+        closeSheet();
+        toast("设置已保存");
+      });
+      els.sheetMask.addEventListener("click", closeSheet);
+      els.btnSaveSettings.addEventListener("click", () => {
+        closeSheet();
+        toast("设置已保存");
+        buzz(10);
+      });
+      els.btnTestAlert.addEventListener("click", () => {
+        ensureAudioCtx();
+        closeSheet();
+        startAlert(true);
+      });
+
+      els.alertModeSeg.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-mode]");
+        if (!btn) return;
+        state.alertMode = btn.dataset.mode;
+        [...els.alertModeSeg.querySelectorAll("button")].forEach((b) => {
+          b.classList.toggle("active", b === btn);
+        });
+        saveSettings();
+        buzz(6);
+      });
+
+      document.querySelectorAll("[data-step]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const key = btn.dataset.step;
+          const dir = Number(btn.dataset.dir);
+          const max = key === "hours" ? 99 : 59;
+          const next = clamp((parseInt(els[key].value, 10) || 0) + dir, 0, max);
+          els[key].value = next;
+          syncDurationFromInputs();
+          saveSettings();
+          buzz(6);
+        });
+      });
+
+      ["hours", "minutes", "seconds", "alertDuration"].forEach((id) => {
+        els[id].addEventListener("change", () => {
+          syncDurationFromInputs();
+          saveSettings();
+        });
+      });
+
+      els.volume.addEventListener("input", () => {
+        els.volumeLabel.textContent = `${els.volume.value}%`;
+        saveSettings();
+      });
+      els.voiceRate.addEventListener("input", () => {
+        els.rateLabel.textContent = Number(els.voiceRate.value).toFixed(1);
+        saveSettings();
+      });
+      ["musicStyle", "voiceLang", "voiceText", "repeatVoice"].forEach((id) => {
+        els[id].addEventListener("change", saveSettings);
+      });
+
+      // Swipe down to close sheet
+      let touchStartY = 0;
+      els.sheet.addEventListener("touchstart", (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+      els.sheet.addEventListener("touchend", (e) => {
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (dy > 80 && els.sheet.scrollTop < 8) closeSheet();
+      }, { passive: true });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden || !state.running) return;
+        state.endAt = Date.now() + state.remainingMs;
+      });
+
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+      }
+
+      loadSettings();
+      updateDisplay();
+      els.ring.style.strokeDasharray = String(RING);
+    })();
+  </script>
+</body>
+</html>
