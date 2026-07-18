@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cursor Timer · 倒计时</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #0f1a17;
+      --bg-mid: #163029;
+      --bg-soft: #1c3a31;
+      --surface: rgba(255, 255, 255, 0.06);
+      --surface-strong: rgba(255, 255, 255, 0.1);
+      --stroke: rgba(232, 214, 168, 0.18);
+      --text: #f3eee4;
+      --text-muted: #a8b5ae;
+      --accent: #e8b86d;
+      --accent-hot: #f07a5a;
+      --accent-cool: #6ec9a8;
+      --danger: #ef6b6b;
+      --ok: #6ec9a8;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+      --font-ui: "Instrument Sans", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font-ui);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, #2a5a48 0%, transparent 55%),
+        radial-gradient(900px 600px at 95% 10%, #5a3d28 0%, transparent 50%),
+        radial-gradient(800px 500px at 50% 110%, #1a4036 0%, transparent 45%),
+        linear-gradient(165deg, var(--bg-deep), var(--bg-mid) 45%, #12241f);
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+      opacity: 0.45;
+    }
+
+    .app {
+      position: relative;
+      width: min(920px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .brand h1 span {
+      color: var(--accent);
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .stage {
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      display: grid;
+      gap: 1.5rem;
+      justify-items: center;
+      animation: rise 0.8s 0.08s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -40% auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232, 184, 109, 0.18), transparent 70%);
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .stage.alerting::after {
+      background: radial-gradient(circle, rgba(240, 122, 90, 0.28), transparent 70%);
+      animation: glowPulse 1s ease-in-out infinite;
+    }
+
+    .display {
+      font-family: var(--font-mono);
+      font-size: clamp(3.2rem, 14vw, 6.5rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      tabular-nums: true;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .display.urgent {
+      color: var(--accent-hot);
+      animation: tickPulse 1s ease-in-out infinite;
+    }
+
+    .display.done {
+      color: var(--accent);
+    }
+
+    .status {
+      min-height: 1.4em;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+
+    .status.hot { color: var(--accent-hot); }
+    .status.ok { color: var(--ok); }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    button, .file-btn {
+      appearance: none;
+      border: 1px solid var(--stroke);
+      background: var(--surface-strong);
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      border-radius: 999px;
+      padding: 0.75rem 1.35rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    button:hover, .file-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(232, 184, 109, 0.45);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    button:active, .file-btn:active { transform: translateY(0); }
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #e8b86d, #d89a4a);
+      color: #1a140c;
+      border-color: transparent;
+    }
+
+    button.danger {
+      background: rgba(239, 107, 107, 0.18);
+      border-color: rgba(239, 107, 107, 0.4);
+      color: #ffd4d4;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.35rem 1.4rem;
+      animation: rise 0.85s 0.14s ease both;
+    }
+
+    .panel h2 {
+      margin: 0 0 1rem;
+      font-size: 1.05rem;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem 1.25rem;
+    }
+
+    label.field {
+      display: grid;
+      gap: 0.4rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    label.field > span {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="range"],
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--stroke);
+      background: rgba(0, 0, 0, 0.22);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 0.7rem 0.85rem;
+      font: inherit;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea { min-height: 72px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(232, 184, 109, 0.55);
+      box-shadow: 0 0 0 3px rgba(232, 184, 109, 0.15);
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 0.4rem;
+      accent-color: var(--accent);
+    }
+
+    .time-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .chips button {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .hint {
+      margin: 0.85rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .file-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .file-btn { display: inline-flex; align-items: center; }
+    .file-btn input { display: none; }
+
+    .file-name {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      padding-top: 0.25rem;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--accent);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes tickPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    @media (max-width: 640px) {
+      .brand { flex-direction: column; align-items: flex-start; }
+      .app { width: min(100% - 1.25rem, 920px); padding-top: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="brand">
+      <h1>Cursor <span>Timer</span></h1>
+      <p>独立倒计时 · 语音 / 音乐提醒</p>
+    </header>
+
+    <section class="stage" id="stage">
+      <div class="display" id="display">00:05:00</div>
+      <div class="status" id="status">准备就绪</div>
+      <div class="controls">
+        <button class="primary" id="btnStart" type="button">开始</button>
+        <button id="btnPause" type="button" disabled>暂停</button>
+        <button id="btnReset" type="button">重置</button>
+        <button class="danger" id="btnStopAlert" type="button" hidden>停止提示</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>倒计时时长</h2>
+      <div class="time-row">
+        <label class="field">
+          <span>小时</span>
+          <input id="hours" type="number" min="0" max="99" value="0" />
+        </label>
+        <label class="field">
+          <span>分钟</span>
+          <input id="minutes" type="number" min="0" max="59" value="5" />
+        </label>
+        <label class="field">
+          <span>秒</span>
+          <input id="seconds" type="number" min="0" max="59" value="0" />
+        </label>
+      </div>
+      <div class="chips" style="margin-top: 0.85rem;">
+        <button type="button" data-preset="60">1 分钟</button>
+        <button type="button" data-preset="300">5 分钟</button>
+        <button type="button" data-preset="600">10 分钟</button>
+        <button type="button" data-preset="1500">25 分钟</button>
+        <button type="button" data-preset="3600">1 小时</button>
+      </div>
+      <p class="hint">修改时长后会同步到显示；运行中改时长需先重置再生效。</p>
+    </section>
+
+    <section class="panel">
+      <h2>提示设置</h2>
+      <div class="grid">
+        <label class="field">
+          <span>提示方式</span>
+          <select id="alertMode">
+            <option value="both">语音 + 音乐</option>
+            <option value="voice">仅语音</option>
+            <option value="music">仅音乐</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>提示持续（秒）</span>
+          <input id="alertDuration" type="number" min="1" max="120" value="10" />
+        </label>
+
+        <label class="field">
+          <span>音量 <strong id="volumeLabel">70%</strong></span>
+          <input id="volume" type="range" min="0" max="100" value="70" />
+        </label>
+
+        <label class="field">
+          <span>内置音乐</span>
+          <select id="musicStyle">
+            <option value="alarm">急促警报</option>
+            <option value="chime">柔和钟声</option>
+            <option value="pulse">脉冲提示</option>
+            <option value="ascending">上行音阶</option>
+          </select>
+        </label>
+
+        <label class="field" style="grid-column: 1 / -1;">
+          <span>语音文案</span>
+          <textarea id="voiceText" placeholder="时间到了，请注意。">时间到了，请注意。</textarea>
+        </label>
+
+        <label class="field">
+          <span>语音语言</span>
+          <select id="voiceLang">
+            <option value="zh-CN">中文</option>
+            <option value="en-US">English</option>
+            <option value="ja-JP">日本語</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>语速 <strong id="rateLabel">1.0</strong></span>
+          <input id="voiceRate" type="range" min="0.5" max="1.5" step="0.1" value="1" />
+        </label>
+
+        <label class="field" style="grid-column: 1 / -1;">
+          <span>自定义音乐文件（可选，覆盖内置音乐）</span>
+          <div class="file-row">
+            <label class="file-btn">
+              选择音频
+              <input id="musicFile" type="file" accept="audio/*" />
+            </label>
+            <button type="button" id="btnClearMusic">清除</button>
+            <span class="file-name" id="musicFileName">未选择文件，使用内置音乐</span>
+          </div>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <label class="check"><input id="repeatVoice" type="checkbox" checked /> 提示期间循环播报语音</label>
+        <button type="button" id="btnTestAlert">试听提示</button>
+      </div>
+      <p class="hint">所有设置会自动保存在本机浏览器中。提示音默认响 10 秒后自动停止，可在上方修改。</p>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = "cursor-timer-settings-v1";
+
+      const els = {
+        stage: document.getElementById("stage"),
+        display: document.getElementById("display"),
+        status: document.getElementById("status"),
+        btnStart: document.getElementById("btnStart"),
+        btnPause: document.getElementById("btnPause"),
+        btnReset: document.getElementById("btnReset"),
+        btnStopAlert: document.getElementById("btnStopAlert"),
+        hours: document.getElementById("hours"),
+        minutes: document.getElementById("minutes"),
+        seconds: document.getElementById("seconds"),
+        alertMode: document.getElementById("alertMode"),
+        alertDuration: document.getElementById("alertDuration"),
+        volume: document.getElementById("volume"),
+        volumeLabel: document.getElementById("volumeLabel"),
+        musicStyle: document.getElementById("musicStyle"),
+        voiceText: document.getElementById("voiceText"),
+        voiceLang: document.getElementById("voiceLang"),
+        voiceRate: document.getElementById("voiceRate"),
+        rateLabel: document.getElementById("rateLabel"),
+        musicFile: document.getElementById("musicFile"),
+        musicFileName: document.getElementById("musicFileName"),
+        btnClearMusic: document.getElementById("btnClearMusic"),
+        repeatVoice: document.getElementById("repeatVoice"),
+        btnTestAlert: document.getElementById("btnTestAlert"),
+      };
+
+      const state = {
+        totalMs: 5 * 60 * 1000,
+        remainingMs: 5 * 60 * 1000,
+        running: false,
+        alerting: false,
+        endAt: 0,
+        tickId: null,
+        alertStopId: null,
+        voiceLoopId: null,
+        audioCtx: null,
+        oscillators: [],
+        customAudio: null,
+        customObjectUrl: null,
+        customFileName: "",
+      };
+
+      function clamp(n, min, max) {
+        return Math.min(max, Math.max(min, n));
+      }
+
+      function pad(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      function formatMs(ms) {
+        const total = Math.max(0, Math.ceil(ms / 1000));
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        const s = total % 60;
+        return `${pad(h)}:${pad(m)}:${pad(s)}`;
+      }
+
+      function readDurationMs() {
+        const h = clamp(parseInt(els.hours.value, 10) || 0, 0, 99);
+        const m = clamp(parseInt(els.minutes.value, 10) || 0, 0, 59);
+        const s = clamp(parseInt(els.seconds.value, 10) || 0, 0, 59);
+        els.hours.value = h;
+        els.minutes.value = m;
+        els.seconds.value = s;
+        return ((h * 3600) + (m * 60) + s) * 1000;
+      }
+
+      function setStatus(text, kind = "") {
+        els.status.textContent = text;
+        els.status.className = "status" + (kind ? ` ${kind}` : "");
+      }
+
+      function updateDisplay() {
+        els.display.textContent = formatMs(state.remainingMs);
+        els.display.classList.toggle("urgent", state.running && state.remainingMs <= 10000 && state.remainingMs > 0);
+        els.display.classList.toggle("done", state.alerting || (!state.running && state.remainingMs === 0 && state.totalMs > 0));
+      }
+
+      function syncDurationFromInputs() {
+        if (state.running || state.alerting) return;
+        state.totalMs = readDurationMs();
+        state.remainingMs = state.totalMs;
+        updateDisplay();
+        if (state.totalMs <= 0) setStatus("请设置大于 0 的时长", "hot");
+        else setStatus("准备就绪");
+      }
+
+      function getSettings() {
+        return {
+          hours: clamp(parseInt(els.hours.value, 10) || 0, 0, 99),
+          minutes: clamp(parseInt(els.minutes.value, 10) || 0, 0, 59),
+          seconds: clamp(parseInt(els.seconds.value, 10) || 0, 0, 59),
+          alertMode: els.alertMode.value,
+          alertDuration: clamp(parseInt(els.alertDuration.value, 10) || 10, 1, 120),
+          volume: clamp(parseInt(els.volume.value, 10) || 0, 0, 100),
+          musicStyle: els.musicStyle.value,
+          voiceText: els.voiceText.value.trim() || "时间到了，请注意。",
+          voiceLang: els.voiceLang.value,
+          voiceRate: clamp(parseFloat(els.voiceRate.value) || 1, 0.5, 1.5),
+          repeatVoice: els.repeatVoice.checked,
+          customFileName: state.customFileName || "",
+        };
+      }
+
+      function applySettings(data) {
+        if (!data) return;
+        els.hours.value = data.hours ?? 0;
+        els.minutes.value = data.minutes ?? 5;
+        els.seconds.value = data.seconds ?? 0;
+        els.alertMode.value = data.alertMode || "both";
+        els.alertDuration.value = data.alertDuration ?? 10;
+        els.volume.value = data.volume ?? 70;
+        els.musicStyle.value = data.musicStyle || "alarm";
+        els.voiceText.value = data.voiceText || "时间到了，请注意。";
+        els.voiceLang.value = data.voiceLang || "zh-CN";
+        els.voiceRate.value = data.voiceRate ?? 1;
+        els.repeatVoice.checked = data.repeatVoice !== false;
+        els.volumeLabel.textContent = `${els.volume.value}%`;
+        els.rateLabel.textContent = Number(els.voiceRate.value).toFixed(1);
+        if (data.customFileName) {
+          els.musicFileName.textContent = `${data.customFileName}（需重新选择文件）`;
+        }
+        syncDurationFromInputs();
+      }
+
+      function saveSettings() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(getSettings()));
+        } catch (_) { /* ignore */ }
+      }
+
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) applySettings(JSON.parse(raw));
+          else syncDurationFromInputs();
+        } catch (_) {
+          syncDurationFromInputs();
+        }
+      }
+
+      function ensureAudioCtx() {
+        if (!state.audioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          state.audioCtx = new Ctx();
+        }
+        if (state.audioCtx.state === "suspended") state.audioCtx.resume();
+        return state.audioCtx;
+      }
+
+      function stopBuiltInMusic() {
+        state.oscillators.forEach((node) => {
+          try { node.stop(); } catch (_) {}
+          try { node.disconnect(); } catch (_) {}
+        });
+        state.oscillators = [];
+      }
+
+      function stopCustomAudio() {
+        if (state.customAudio) {
+          state.customAudio.pause();
+          state.customAudio.currentTime = 0;
+        }
+      }
+
+      function stopVoice() {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        if (state.voiceLoopId) {
+          clearInterval(state.voiceLoopId);
+          state.voiceLoopId = null;
+        }
+      }
+
+      function stopAlert({ keepUi = false } = {}) {
+        stopBuiltInMusic();
+        stopCustomAudio();
+        stopVoice();
+        if (state.alertStopId) {
+          clearTimeout(state.alertStopId);
+          state.alertStopId = null;
+        }
+        state.alerting = false;
+        els.stage.classList.remove("alerting");
+        els.btnStopAlert.hidden = true;
+        if (!keepUi && !state.running) {
+          if (state.remainingMs <= 0) setStatus("时间到 · 提示已停止", "ok");
+          else setStatus("已停止提示");
+        }
+      }
+
+      function speakOnce(text, lang, rate, volume) {
+        if (!window.speechSynthesis) return;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = lang;
+        utter.rate = rate;
+        utter.volume = volume;
+        const voices = window.speechSynthesis.getVoices();
+        const match = voices.find((v) => v.lang === lang) || voices.find((v) => v.lang.startsWith(lang.slice(0, 2)));
+        if (match) utter.voice = match;
+        window.speechSynthesis.speak(utter);
+      }
+
+      function startVoiceAlert(settings) {
+        if (!window.speechSynthesis) {
+          setStatus("当前浏览器不支持语音合成，已改用音乐提示", "hot");
+          return;
+        }
+        const vol = settings.volume / 100;
+        const speak = () => speakOnce(settings.voiceText, settings.voiceLang, settings.voiceRate, vol);
+        speak();
+        if (settings.repeatVoice) {
+          const interval = clamp(Math.round(2200 / settings.voiceRate), 1400, 4000);
+          state.voiceLoopId = setInterval(speak, interval);
+        }
+      }
+
+      function playPattern(ctx, master, style, durationSec) {
+        const now = ctx.currentTime;
+        const end = now + durationSec;
+
+        const scheduleBeep = (freq, start, len, type = "square", gain = 0.22) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = type;
+          osc.frequency.value = freq;
+          g.gain.setValueAtTime(0.0001, start);
+          g.gain.exponentialRampToValueAtTime(gain * (settingsVolume()), start + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, start + len);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(start);
+          osc.stop(start + len + 0.02);
+          state.oscillators.push(osc);
+        };
+
+        const settingsVolume = () => clamp(parseInt(els.volume.value, 10) || 0, 0, 100) / 100;
+
+        if (style === "chime") {
+          for (let t = now; t < end; t += 1.6) {
+            [523.25, 659.25, 783.99].forEach((f, i) => {
+              scheduleBeep(f, t + i * 0.18, 0.55, "sine", 0.28);
+            });
+          }
+          return;
+        }
+
+        if (style === "pulse") {
+          for (let t = now; t < end; t += 0.9) {
+            scheduleBeep(440, t, 0.35, "triangle", 0.25);
+            scheduleBeep(554.37, t + 0.35, 0.35, "triangle", 0.2);
+          }
+          return;
+        }
+
+        if (style === "ascending") {
+          const notes = [261.63, 329.63, 392.0, 523.25, 659.25];
+          let i = 0;
+          for (let t = now; t < end; t += 0.35) {
+            scheduleBeep(notes[i % notes.length], t, 0.28, "sine", 0.24);
+            i += 1;
+          }
+          return;
+        }
+
+        // alarm (default)
+        for (let t = now; t < end; t += 0.55) {
+          scheduleBeep(880, t, 0.18, "square", 0.2);
+          scheduleBeep(1174.66, t + 0.2, 0.18, "square", 0.18);
+        }
+      }
+
+      function startMusicAlert(settings) {
+        const durationSec = settings.alertDuration;
+
+        if (state.customAudio) {
+          state.customAudio.loop = true;
+          state.customAudio.volume = settings.volume / 100;
+          state.customAudio.currentTime = 0;
+          state.customAudio.play().catch(() => {
+            setStatus("自定义音频播放失败，请检查文件或浏览器权限", "hot");
+          });
+          return;
+        }
+
+        const ctx = ensureAudioCtx();
+        const master = ctx.createGain();
+        master.gain.value = 1;
+        master.connect(ctx.destination);
+        playPattern(ctx, master, settings.musicStyle, durationSec);
+      }
+
+      function startAlert(isTest = false) {
+        stopAlert({ keepUi: true });
+        const settings = getSettings();
+        els.alertDuration.value = settings.alertDuration;
+        saveSettings();
+
+        state.alerting = true;
+        els.stage.classList.add("alerting");
+        els.btnStopAlert.hidden = false;
+        setStatus(isTest ? `试听中 · ${settings.alertDuration} 秒后自动停止` : `时间到 · 提示中（${settings.alertDuration} 秒）`, "hot");
+
+        const mode = settings.alertMode;
+        if (mode === "voice" || mode === "both") startVoiceAlert(settings);
+        if (mode === "music" || mode === "both") startMusicAlert(settings);
+
+        state.alertStopId = setTimeout(() => {
+          stopAlert();
+          if (!isTest) setStatus("时间到 · 提示已自动停止", "ok");
+          else setStatus("试听结束", "ok");
+          updateDisplay();
+        }, settings.alertDuration * 1000);
+      }
+
+      function tick() {
+        if (!state.running) return;
+        state.remainingMs = Math.max(0, state.endAt - Date.now());
+        updateDisplay();
+        if (state.remainingMs <= 0) {
+          state.running = false;
+          clearInterval(state.tickId);
+          state.tickId = null;
+          els.btnStart.disabled = false;
+          els.btnPause.disabled = true;
+          els.btnStart.textContent = "开始";
+          startAlert(false);
+        }
+      }
+
+      function startTimer() {
+        const ms = state.running ? state.remainingMs : readDurationMs();
+        if (ms <= 0) {
+          setStatus("请设置大于 0 的时长", "hot");
+          return;
+        }
+        stopAlert({ keepUi: true });
+        ensureAudioCtx();
+        if (!state.running) {
+          state.totalMs = ms;
+          state.remainingMs = ms;
+        }
+        state.running = true;
+        state.endAt = Date.now() + state.remainingMs;
+        els.btnStart.disabled = true;
+        els.btnPause.disabled = false;
+        els.btnStart.textContent = "开始";
+        setStatus("计时中…");
+        updateDisplay();
+        clearInterval(state.tickId);
+        state.tickId = setInterval(tick, 200);
+        tick();
+        saveSettings();
+      }
+
+      function pauseTimer() {
+        if (!state.running) return;
+        state.running = false;
+        state.remainingMs = Math.max(0, state.endAt - Date.now());
+        clearInterval(state.tickId);
+        state.tickId = null;
+        els.btnStart.disabled = false;
+        els.btnPause.disabled = true;
+        els.btnStart.textContent = "继续";
+        setStatus("已暂停");
+        updateDisplay();
+      }
+
+      function resetTimer() {
+        stopAlert();
+        state.running = false;
+        clearInterval(state.tickId);
+        state.tickId = null;
+        state.totalMs = readDurationMs();
+        state.remainingMs = state.totalMs;
+        els.btnStart.disabled = false;
+        els.btnPause.disabled = true;
+        els.btnStart.textContent = "开始";
+        setStatus(state.totalMs > 0 ? "已重置" : "请设置大于 0 的时长", state.totalMs > 0 ? "ok" : "hot");
+        updateDisplay();
+        saveSettings();
+      }
+
+      // Events
+      els.btnStart.addEventListener("click", startTimer);
+      els.btnPause.addEventListener("click", pauseTimer);
+      els.btnReset.addEventListener("click", resetTimer);
+      els.btnStopAlert.addEventListener("click", () => stopAlert());
+      els.btnTestAlert.addEventListener("click", () => {
+        ensureAudioCtx();
+        startAlert(true);
+      });
+
+      ["hours", "minutes", "seconds"].forEach((id) => {
+        els[id].addEventListener("change", () => {
+          syncDurationFromInputs();
+          saveSettings();
+        });
+        els[id].addEventListener("input", syncDurationFromInputs);
+      });
+
+      document.querySelectorAll("[data-preset]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (state.running || state.alerting) return;
+          const total = parseInt(btn.dataset.preset, 10);
+          els.hours.value = Math.floor(total / 3600);
+          els.minutes.value = Math.floor((total % 3600) / 60);
+          els.seconds.value = total % 60;
+          syncDurationFromInputs();
+          saveSettings();
+        });
+      });
+
+      [
+        "alertMode", "alertDuration", "musicStyle", "voiceText",
+        "voiceLang", "repeatVoice",
+      ].forEach((id) => {
+        els[id].addEventListener("change", saveSettings);
+      });
+
+      els.volume.addEventListener("input", () => {
+        els.volumeLabel.textContent = `${els.volume.value}%`;
+        if (state.customAudio) state.customAudio.volume = clamp(parseInt(els.volume.value, 10) || 0, 0, 100) / 100;
+        saveSettings();
+      });
+
+      els.voiceRate.addEventListener("input", () => {
+        els.rateLabel.textContent = Number(els.voiceRate.value).toFixed(1);
+        saveSettings();
+      });
+
+      els.musicFile.addEventListener("change", () => {
+        const file = els.musicFile.files && els.musicFile.files[0];
+        if (!file) return;
+        if (state.customObjectUrl) URL.revokeObjectURL(state.customObjectUrl);
+        state.customObjectUrl = URL.createObjectURL(file);
+        state.customAudio = new Audio(state.customObjectUrl);
+        state.customAudio.preload = "auto";
+        state.customFileName = file.name;
+        els.musicFileName.textContent = file.name;
+        saveSettings();
+      });
+
+      els.btnClearMusic.addEventListener("click", () => {
+        stopCustomAudio();
+        if (state.customObjectUrl) URL.revokeObjectURL(state.customObjectUrl);
+        state.customObjectUrl = null;
+        state.customAudio = null;
+        state.customFileName = "";
+        els.musicFile.value = "";
+        els.musicFileName.textContent = "未选择文件，使用内置音乐";
+        saveSettings();
+      });
+
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+      }
+
+      loadSettings();
+      updateDisplay();
+    })();
+  </script>
+</body>
+</html>
