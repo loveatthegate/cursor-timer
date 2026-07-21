@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026-07-21 · AI 软硬件早报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12202c;
+      --ink-soft: #3a4d5c;
+      --muted: #6b7c8a;
+      --paper: #f3f6f8;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 32, 44, 0.08);
+      --accent: #c45c26;
+      --accent-2: #1f6f6a;
+      --hw: #1f6f6a;
+      --sw: #2a5f8f;
+      --os: #8a4b2f;
+      --mk: #b45309;
+      --shadow: 0 18px 50px rgba(18, 32, 44, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(31, 111, 106, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 95% 5%, rgba(196, 92, 38, 0.14), transparent 50%),
+        linear-gradient(180deg, #e8eef2 0%, var(--paper) 35%, #eef2f4 100%);
+      min-height: 100vh;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    header.hero {
+      padding: 1.2rem 0 2rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Newsreader", "Noto Sans SC", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    .date-pill {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lede {
+      margin: 1rem 0 0;
+      max-width: 42rem;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s ease 0.08s both;
+    }
+
+    nav.toc a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--line);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    nav.toc a:hover { transform: translateY(-1px); background: #fff; }
+
+    section.block {
+      margin-top: 1.75rem;
+      animation: rise 0.75s ease both;
+    }
+
+    section.block:nth-of-type(1) { animation-delay: 0.12s; }
+    section.block:nth-of-type(2) { animation-delay: 0.18s; }
+    section.block:nth-of-type(3) { animation-delay: 0.24s; }
+    section.block:nth-of-type(4) { animation-delay: 0.3s; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tag {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tag.hw { background: var(--hw); }
+    .tag.sw { background: var(--sw); }
+    .tag.os { background: var(--os); }
+    .tag.mk { background: var(--mk); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      .wrap { width: min(1120px, calc(100% - 1.25rem)); }
+    }
+
+    article.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem 1.1rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    article.card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent-bar, var(--accent));
+      opacity: 0.85;
+    }
+
+    article.card.hw { --accent-bar: var(--hw); }
+    article.card.sw { --accent-bar: var(--sw); }
+    article.card.os { --accent-bar: var(--os); }
+    article.card.mk { --accent-bar: var(--mk); }
+
+    article.card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 56px rgba(18, 32, 44, 0.12);
+      border-color: rgba(18, 32, 44, 0.14);
+    }
+
+    article.card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    article.card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta .src { font-weight: 600; color: var(--ink-soft); }
+    .meta .link-hint { margin-left: auto; color: var(--accent); font-weight: 600; }
+
+    .highlights {
+      background: linear-gradient(135deg, rgba(31,111,106,0.08), rgba(196,92,38,0.08));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+
+    .highlights ul {
+      margin: 0.7rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    .highlights li { margin-bottom: 0.45rem; }
+    .highlights strong { color: var(--ink); font-weight: 650; }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .quotes { grid-template-columns: 1fr; }
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+    }
+
+    .quote .sym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .quote .px {
+      margin-top: 0.25rem;
+      font-family: "Newsreader", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .quote .chg { font-size: 0.82rem; margin-top: 0.15rem; }
+    .chg.up { color: #0f7a4a; }
+    .chg.down { color: #b42318; }
+
+    footer {
+      margin-top: 2.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.65;
+      animation: rise 0.8s ease 0.35s both;
+    }
+
+    footer a { color: var(--sw); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand-row">
+        <h1 class="brand">AI 软硬件<span>早报</span></h1>
+        <div class="date-pill">2026年7月21日 · 周二</div>
+      </div>
+      <p class="lede">近 24 小时焦点：国内智算规模与机器人产能数据出炉，Kimi 因算力告急限流并冲刺港股；海外侧 Google 曝光 Gemini 专用「Frozen v2」芯片，中国开源模型搅动美国政策辩论。</p>
+      <nav class="toc" aria-label="栏目导航">
+        <a href="#cn-hw">国内硬件</a>
+        <a href="#cn-sw">国内软件</a>
+        <a href="#overseas">海外动态</a>
+        <a href="#today">今日看点 / 行情</a>
+      </nav>
+    </header>
+
+    <section class="block" id="cn-hw">
+      <div class="section-head">
+        <span class="tag hw" aria-hidden="true"></span>
+        <h2>国内硬件</h2>
+      </div>
+      <div class="grid">
+        <a class="card hw" href="http://finance.people.com.cn/n1/2026/0720/c1004-40764208.html" target="_blank" rel="noopener noreferrer">
+          <h3>工信部：上半年智能算力规模达 2185 EFLOPS</h3>
+          <p>国新办发布会披露，截至 6 月底智算规模同比增 177%（FP16）；东部/西部分别占 55.9%、32.6%，全国算力设施上架率约 71.4%，并推进「算力超市」与互联互通。</p>
+          <div class="meta">
+            <span class="src">人民网 / 工信部</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/p/3903710346790535?f=rss" target="_blank" rel="noopener noreferrer">
+          <h3>人形机器人整机超全球半数，四足销量近七成</h3>
+          <p>工信部同期数据显示：我国研发四足机器人约占全球销量 70%，人形整机产品达 400 余款、超过全球半数，智能机器人成为上半年优势产业亮点之一。</p>
+          <div class="meta">
+            <span class="src">36氪晚报（援引工信部）</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/p/3903885834028931?f=rss" target="_blank" rel="noopener noreferrer">
+          <h3>速腾聚创发布第二代全固态感知平台</h3>
+          <p>面向具身智能从「展厅演示」走向工厂/园区/家庭长时作业，强调为物理 AI 提供高精度三维空间数据入口，补足纯视觉与仿真数据在测距、材质与动态交互上的短板。</p>
+          <div class="meta">
+            <span class="src">36氪</span>
+            <span>2026-07-21</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/p/3899174356387718?f=rss" target="_blank" rel="noopener noreferrer">
+          <h3>月泉仿生完成数亿元 Pre-A+，灵巧手进入量产</h3>
+          <p>长发、华控、华夏等联合投资；公司称仿生拉压体灵巧手已万台量产、订单过亿，资金将用于产能与「大脑—身体—环境」一体化具身体系。</p>
+          <div class="meta">
+            <span class="src">36氪首发</span>
+            <span>2026-07-21</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="cn-sw">
+      <div class="section-head">
+        <span class="tag sw" aria-hidden="true"></span>
+        <h2>国内软件</h2>
+      </div>
+      <div class="grid">
+        <a class="card sw" href="https://finance.sina.com.cn/roll/2026-07-21/doc-iniiphzn9420160.shtml" target="_blank" rel="noopener noreferrer">
+          <h3>月之暗面：K3 爆火后暂停 C 端新订，冲刺港股估值 300 亿美金</h3>
+          <p>Kimi K3 上线约 48 小时后因请求量激增限流扩容；报道称公司推进港股 IPO，目标投后估值约 300 亿美元，ARR 自 4 月约 2 亿增至 6 月约 3 亿美元。</p>
+          <div class="meta">
+            <span class="src">新浪财经 / 财新</span>
+            <span>2026-07-20 / 21</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://www.caixin.com/2026-07-20/102466296.html" target="_blank" rel="noopener noreferrer">
+          <h3>开源冲击涟漪：智谱、MiniMax 股价承压</h3>
+          <p>财新称 K3 发布后算力紧缺并限制新用户订阅，周一港股智谱、MiniMax 估值下调；北美市场亦重新审视 AI 资本开支回报，开源权重继续改写定价预期。</p>
+          <div class="meta">
+            <span class="src">财新</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://36kr.com/p/3904049563731849?f=rss" target="_blank" rel="noopener noreferrer">
+          <h3>心言「巴布」：情感陪伴 App 走向家庭主动式机器人</h3>
+          <p>测测系心言集团在 WAIC 展示 Buboo 1，去掉唤醒词、靠多模态感知主动交互；试图从屏幕情感陪伴延伸到居家「在场感」智能体，考验端侧记忆与分寸感。</p>
+          <div class="meta">
+            <span class="src">36氪</span>
+            <span>2026-07-21</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://36kr.com/p/3903761449617027?f=rss" target="_blank" rel="noopener noreferrer">
+          <h3>青心意创发布毛绒人形 Amoo，自研 OS 承载交互</h3>
+          <p>约 80cm 双足毛绒机器人，强调全套传感器与表情分析；前 Cruise 模型科学家领衔，产品逻辑是「硬件定形态、软件持续增量」，押注家庭/陪伴算力场景。</p>
+          <div class="meta">
+            <span class="src">36氪硬氪</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="overseas">
+      <div class="section-head">
+        <span class="tag os" aria-hidden="true"></span>
+        <h2>海外动态</h2>
+      </div>
+      <div class="grid">
+        <a class="card os" href="https://techcrunch.com/2026/07/20/google-is-working-on-a-new-ai-chip-designed-to-make-gemini-more-efficient/" target="_blank" rel="noopener noreferrer">
+          <h3>Google 研发 Gemini 专用芯片「Frozen v2」</h3>
+          <p>The Information 报道：目标约 2028 年，或以 tokens/瓦计较现有 TPU 提升 6–10 倍，把部分架构硬编码进硅片；Google 未直接证实。消息提振 Alphabet，盘中一度大涨。</p>
+          <div class="meta">
+            <span class="src">TechCrunch</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.technologyreview.com/2026/07/20/1140675/chinas-ai-models-have-trumps-ai-world-at-war-with-itself/" target="_blank" rel="noopener noreferrer">
+          <h3>MIT TR：Kimi 等开源模型撕裂美国 AI 政策圈</h3>
+          <p>周末多位特朗普 AI 顾问公开互怼——开源免费中国模型冲击闭源收费叙事，同时与白宫加强前沿模型审查/准入的路线冲突，经济与安全叙事同时承压。</p>
+          <div class="meta">
+            <span class="src">MIT Technology Review</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.theverge.com/tech/968375/sony-udio-lawsuit-songs-ai-copyright" target="_blank" rel="noopener noreferrer">
+          <h3>索尼起诉 Udio：列约 3 万首歌曲主张版权</h3>
+          <p>The Verge 报道索尼音乐就 AI 音乐生成器训练/输出扩大诉讼材料，生成式音频版权战从原则争议进入「曲目级」举证，影响音乐大模型与训练数据合规成本。</p>
+          <div class="meta">
+            <span class="src">The Verge</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://cursor.com/blog/agent-swarm-model-economics" target="_blank" rel="noopener noreferrer">
+          <h3>Cursor：Agent Swarm 的模型经济学讨论升温</h3>
+          <p>官方博客拆解多 Agent 并行时的模型选择与成本结构；HN 热议显示，编码 Agent 已从「单模型对话」进入「集群调度 + 单位任务成本」的产品竞争阶段。</p>
+          <div class="meta">
+            <span class="src">Cursor Blog / HN</span>
+            <span>2026-07-20</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="today">
+      <div class="section-head">
+        <span class="tag mk" aria-hidden="true"></span>
+        <h2>今日看点 / 行情摘要</h2>
+      </div>
+      <div class="highlights">
+        <p style="margin:0;color:var(--ink-soft);line-height:1.65;">
+          <strong style="color:var(--ink);">看点：</strong>国内用「智算家底 + 机器人产能」给出供给侧成绩单，同时 Kimi 用限流证明需求侧算力仍是硬约束；海外则从「租集群」进一步走到「把模型架构焊进芯片」——效率叙事开始左右股价与政策辩论。
+        </p>
+        <ul>
+          <li><strong>算力：</strong>2185 EFLOPS 与上架率数据说明规模扩张很快，但 K3 限流提醒：可用推理产能与峰值宣传不是一回事。</li>
+          <li><strong>模型：</strong>中国开源权重继续改写全球定价；美国政策圈对「保护闭源」与「开放竞争」分裂加剧。</li>
+          <li><strong>硬件：</strong>Google Frozen v2、OpenAI/Anthropic 自研芯片传闻同框，云厂商垂直整合加速。</li>
+        </ul>
+        <div class="quotes" aria-label="公开行情摘录">
+          <div class="quote">
+            <div class="sym">NASDAQ · NVDA</div>
+            <div class="px">$203.28</div>
+            <div class="chg up">7/20 收盘，较 7/17 约 +0.2%</div>
+          </div>
+          <div class="quote">
+            <div class="sym">NASDAQ · GOOGL</div>
+            <div class="px">$351.99</div>
+            <div class="chg up">7/20 收盘，较 7/17 约 +1.5%（Frozen 消息提振）</div>
+          </div>
+          <div class="quote">
+            <div class="sym">NYSE · BABA</div>
+            <div class="px">$120.34</div>
+            <div class="chg up">7/20 收盘，较 7/17 约 +4.7%</div>
+          </div>
+        </div>
+        <p style="margin:0.95rem 0 0;font-size:0.85rem;color:var(--muted);">
+          行情说明：美股 7/20（周一）为最近完整交易日；AMD 收于约 $503.57（较 7/17 约 +1.6%）。A 股早盘半导体板块领涨（36氪快讯）。数据来自 Yahoo Finance 公开接口与公开报道，仅供参考，不构成投资建议。
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <p><strong>采集说明：</strong>本报基于公开网页与 RSS（36氪、人民网/工信部发布会转述、财新、新浪财经、MIT Technology Review、TechCrunch 官网文章、The Verge、Cursor Blog、Yahoo Finance 等）整理，时间窗口约 2026-07-20 至 2026-07-21。</p>
+      <p><strong>源可用性：</strong>机器之心 RSS 仍跳转数据服务页，未取得条目；TechCrunch FeedBurner 返回异常/过时内容，已跳过（改用官网单篇）；InfoQ 中文 RSS 无有效返回，已跳过；工信部官网首页 403，改用人民网通稿；Hacker News RSS（hnrss.org）今日可用。</p>
+      <p>生成于 UTC 2026-07-21 · <a href="./index.html">返回最新一期索引</a> · <a href="./2026-07-20.html">上一期 07-20</a></p>
+    </footer>
+  </div>
+</body>
+</html>
