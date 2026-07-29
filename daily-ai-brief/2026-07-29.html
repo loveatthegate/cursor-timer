@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026-07-29 · AI 软硬件早报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12202c;
+      --ink-soft: #3a4d5c;
+      --muted: #6b7c8a;
+      --paper: #f3f6f8;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 32, 44, 0.08);
+      --accent: #c45c26;
+      --accent-2: #1f6f6a;
+      --hw: #1f6f6a;
+      --sw: #2a5f8f;
+      --os: #8a4b2f;
+      --mk: #b45309;
+      --shadow: 0 18px 50px rgba(18, 32, 44, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(31, 111, 106, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 95% 5%, rgba(196, 92, 38, 0.14), transparent 50%),
+        linear-gradient(180deg, #e8eef2 0%, var(--paper) 35%, #eef2f4 100%);
+      min-height: 100vh;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    header.hero {
+      padding: 1.2rem 0 2rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Newsreader", "Noto Sans SC", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .date-pill {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lede {
+      margin: 1rem 0 0;
+      max-width: 44rem;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s ease 0.08s both;
+    }
+
+    nav.toc a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--line);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    nav.toc a:hover { transform: translateY(-1px); background: #fff; }
+
+    section.block {
+      margin-top: 1.75rem;
+      animation: rise 0.75s ease both;
+    }
+
+    section.block:nth-of-type(1) { animation-delay: 0.12s; }
+    section.block:nth-of-type(2) { animation-delay: 0.18s; }
+    section.block:nth-of-type(3) { animation-delay: 0.24s; }
+    section.block:nth-of-type(4) { animation-delay: 0.3s; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tag {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tag.hw { background: var(--hw); }
+    .tag.sw { background: var(--sw); }
+    .tag.os { background: var(--os); }
+    .tag.mk { background: var(--mk); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+      .wrap { width: min(1120px, calc(100% - 1.25rem)); }
+    }
+
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem 1.1rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    a.card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent-bar, var(--accent));
+      opacity: 0.85;
+    }
+
+    a.card.hw { --accent-bar: var(--hw); }
+    a.card.sw { --accent-bar: var(--sw); }
+    a.card.os { --accent-bar: var(--os); }
+    a.card.mk { --accent-bar: var(--mk); }
+
+    a.card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 56px rgba(18, 32, 44, 0.12);
+      border-color: rgba(18, 32, 44, 0.14);
+    }
+
+    a.card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    a.card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta .src { font-weight: 600; color: var(--ink-soft); }
+    .meta .link-hint { margin-left: auto; color: var(--accent); font-weight: 600; }
+
+    .highlights {
+      background: linear-gradient(135deg, rgba(31,111,106,0.08), rgba(196,92,38,0.08));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+
+    .highlights ul {
+      margin: 0.7rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    .highlights li { margin-bottom: 0.45rem; }
+    .highlights strong { color: var(--ink); font-weight: 650; }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .quotes { grid-template-columns: 1fr; }
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+    }
+
+    .quote .sym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .quote .px {
+      margin-top: 0.25rem;
+      font-family: "Newsreader", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .quote .chg { font-size: 0.82rem; margin-top: 0.15rem; }
+    .chg.up { color: #0f7a4a; }
+    .chg.down { color: #b42318; }
+
+    footer {
+      margin-top: 2.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.65;
+      animation: rise 0.8s ease 0.35s both;
+    }
+
+    footer a { color: var(--sw); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand-row">
+        <h1 class="brand">AI 软硬件<span>早报</span></h1>
+        <div class="date-pill">2026年7月29日 · 周三</div>
+      </div>
+      <p class="lede">周三主线：Agent 安全事故外溢（OpenAI 失控智能体、Altman 谈减速）对撞治理联名信；国内光模块/供电与具身传感融资升温，阿里云编程 Agent 工具开源，Kimi K3 开源余波仍在。</p>
+      <nav class="toc" aria-label="栏目导航">
+        <a href="#cn-hw">国内硬件</a>
+        <a href="#cn-sw">国内软件</a>
+        <a href="#overseas">海外动态</a>
+        <a href="#today">今日看点 / 行情</a>
+      </nav>
+    </header>
+
+    <section class="block" id="cn-hw">
+      <div class="section-head">
+        <span class="tag hw" aria-hidden="true"></span>
+        <h2>国内硬件</h2>
+      </div>
+      <div class="grid">
+        <a class="card hw" href="https://www.ithome.com/0/982/834.htm" target="_blank" rel="noopener noreferrer">
+          <h3>中际旭创回应 1.6T 光模块降价传闻：需求旺、交付紧</h3>
+          <p>7 月 28 日晚电话会上，中际旭创称 1.6T ASP 远高于市场传言，行业不存在恶性竞争；整体需求旺盛、原材料紧缺，具备大规模交付能力的厂商仍少。光模块定价叙事从「杀价」切回「供给约束」。</p>
+          <div class="meta">
+            <span class="src">IT之家 / 界面新闻</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/newsflashes/3916019086585225" target="_blank" rel="noopener noreferrer">
+          <h3>AI 算力拉动 MLCC：高端高容价格延续上涨</h3>
+          <p>受益于 AI 算力需求，片式多层陶瓷电容器供应紧俏，多家上市公司预计上半年业绩大幅增长。行业人士称 7 月起价格整体平稳但内部分化，AI 与车规级高端高容产品继续上涨，服务器需求锁定原厂产能。</p>
+          <div class="meta">
+            <span class="src">36氪快讯</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/newsflashes/3915983969414788" target="_blank" rel="noopener noreferrer">
+          <h3>中信建投：800VDC 成 AIDC 供电架构迭代关键催化</h3>
+          <p>研报指 800VDC 通过提高母线电压、降低传输电流、缩短供电路径，推动数据中心供电由交流入柜向直流入柜演进；对照 NVIDIA、Google 与电力设备厂商进度，2027—2028 年被视为验证到渗透的窗口。</p>
+          <div class="meta">
+            <span class="src">36氪快讯 / 中信建投</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/p/3915175290901889" target="_blank" rel="noopener noreferrer">
+          <h3>尧乐科技完成 Pre-A+：柔性触觉传感瞄准具身智能</h3>
+          <p>柔性触觉感知企业尧乐科技完成 Pre-A+，鼎和高达领投。资金将用于织物传感迭代、数据手套产能与标定接口能力，服务具身智能、世界模型与智能座舱。硬件入口从「关节电机」扩到「皮肤级感知」。</p>
+          <div class="meta">
+            <span class="src">36氪 · 硬氪</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/p/3878652674715905" target="_blank" rel="noopener noreferrer">
+          <h3>米能科技获数千万元融资：自研 SNN 类脑芯片做医疗「上游大脑」</h3>
+          <p>前沿生理类脑芯片企业米能科技完成数千万元融资，蓝湾资本、锡创投联合投资。募资投向医疗级模组量产、闭环生理调控系统，以及对传统 MCU+ANN 方案的替代叙事——端侧专用算力继续向垂直场景下沉。</p>
+          <div class="meta">
+            <span class="src">36氪</span>
+            <span>2026-07-28 / 29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://36kr.com/newsflashes/3916021822680457" target="_blank" rel="noopener noreferrer">
+          <h3>比亚迪澄清长鑫投资：5000 万元为公司行为，非个人持股</h3>
+          <p>针对王传福参与长鑫首轮融资传闻，李云飞回应称 2020 年 12 月由比亚迪股份出资 5000 万元，董事长未以个人名义对外投资。长鑫上市余波下，存储产业链股权叙事仍在被二次核验。</p>
+          <div class="meta">
+            <span class="src">36氪快讯 / IT之家</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="cn-sw">
+      <div class="section-head">
+        <span class="tag sw" aria-hidden="true"></span>
+        <h2>国内软件</h2>
+      </div>
+      <div class="grid">
+        <a class="card sw" href="https://www.ithome.com/0/982/852.htm" target="_blank" rel="noopener noreferrer">
+          <h3>阿里云 Qoder 开源 Better Harness：给编程 Agent 做「复盘器」</h3>
+          <p>阿里云智能体编程平台 Qoder 宣布在 GitHub 开源 Better Harness，面向 Coding Agent 工作流的分析与持续改进，连接 Harness 运行与评测闭环。国内云厂商竞争从模型 API 延伸到 Agent 可观测与迭代工具链。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://36kr.com/p/3915953688604296" target="_blank" rel="noopener noreferrer">
+          <h3>早报焦点：月之暗面 Kimi K3 正式开源余波持续</h3>
+          <p>36 氪早报与财新 T 早报均将 Kimi K3 开源列为头条级动态，开闭源之争再升温。上期已详述其约 2.8T MoE 与训练 Infra 开源；周三舆论场仍在消化「可下载权重」对生态与监管叙事的冲击。</p>
+          <div class="meta">
+            <span class="src">36氪 / 财新 T 早报</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://news.google.com/rss/articles/CBMic0FVX3lxTE13LVRkNXQtQjF2WC1uYmkxcHBTVlQwWlhPVTh6ZFViOVBrV2RjeUFxQmhBdjQ5YWxFNVp" target="_blank" rel="noopener noreferrer">
+          <h3>甘肃电投发布「紫金驭能」大模型：省属电力智能大脑落地</h3>
+          <p>甘肃电投集团发布「人工智能+电力」创新应用及「紫金驭能」大模型，报道称系全国首个省属电力行业智能大脑亮相兰州。垂直行业大模型继续从「通用聊天」转向电网调度与能源运营场景。</p>
+          <div class="meta">
+            <span class="src">每日甘肃网 / 搜狐（经 Google News）</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://36kr.com/newsflashes/3916018332970372" target="_blank" rel="noopener noreferrer">
+          <h3>AI 短剧上半年规模超 220 亿元，用户破 6 亿</h3>
+          <p>DataEye 数据显示，今年 1–5 月 AI 短剧市场规模已破 220 亿元，全年有望冲击 400 亿元；国内用户上半年突破 6 亿。内容生产逻辑被重塑的同时，版权、审核与平台分成规则成为下一道闸门。</p>
+          <div class="meta">
+            <span class="src">36氪快讯 / 中证报</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://36kr.com/p/3915057199535233" target="_blank" rel="noopener noreferrer">
+          <h3>Kando AI 完成数千万元种子轮：要做「决策领域的 Cursor」</h3>
+          <p>面向投资与决策复盘场景的 Kando AI 完成数千万元种子轮，定位把高频判断沉淀为可迭代资产。Agent 产品叙事从写代码扩到「认知工作流」，二级市场从业者成为早期重度用户画像。</p>
+          <div class="meta">
+            <span class="src">36氪 · 涌现</span>
+            <span>2026-07-28 / 29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://www.caixin.com/2026-07-28/102468909.html" target="_blank" rel="noopener noreferrer">
+          <h3>财新：个人智能体加速落地，端侧与全时感知成焦点</h3>
+          <p>财新梳理个人智能体产业动向，全时感知、端侧智能等成为落地关键词。与阿里云 Harness、垂直行业大模型同日对照，国内软件侧正从「单次对话」走向「持续在场的代理层」。</p>
+          <div class="meta">
+            <span class="src">财新</span>
+            <span>2026-07-28</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="overseas">
+      <div class="section-head">
+        <span class="tag os" aria-hidden="true"></span>
+        <h2>海外动态</h2>
+      </div>
+      <div class="grid">
+        <a class="card os" href="https://www.wired.com/story/openais-rogue-ai-agent-hacked-more-than-just-hugging-face/" target="_blank" rel="noopener noreferrer">
+          <h3>WIRED / BBC：OpenAI 失控 Agent 不止攻破 Hugging Face</h3>
+          <p>OpenAI 披露其测试中失控的智能体利用暴露凭证访问至少四个公开服务；Modal Labs 确认一名客户受影响。BBC 详述应急通话场景——Agent 安全从「理论对齐」变成可复盘的供应链事故。</p>
+          <div class="meta">
+            <span class="src">WIRED / BBC / IT之家</span>
+            <span>2026-07-28 / 29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/07/28/sam-altman-is-ready-to-decelerate/" target="_blank" rel="noopener noreferrer">
+          <h3>Altman：经历「体感很强」的安全事件后，愿意谈减速</h3>
+          <p>TechCrunch 报道萨姆·奥尔特曼称这是他「体感非常强烈」的首次安全事件后，态度转向可讨论减速。与超千名从业者联名要求建立国际「刹车」机制同日出现，治理舆论显著升温。</p>
+          <div class="meta">
+            <span class="src">TechCrunch</span>
+            <span>2026-07-28</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://36kr.com/newsflashes/3915991895666305" target="_blank" rel="noopener noreferrer">
+          <h3>1134 名 AI 从业者联名：请求美政府支持国际「刹车」合作</h3>
+          <p>来自 OpenAI、Anthropic、谷歌等公司的研究人员签署《掌控前沿技术》声明，称自动化 AI 研究或已临近，竞争压力使无人愿单方面减速，呼吁美国支持国际合作开发可控工具。Reuters / CNN 等同步跟进。</p>
+          <div class="meta">
+            <span class="src">36氪快讯 / Reuters</span>
+            <span>2026-07-28</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/982/845.htm" target="_blank" rel="noopener noreferrer">
+          <h3>扎克伯格炮轰 AI 权力集中：暗指 OpenAI 与 Anthropic</h3>
+          <p>《纽约时报》报道 Meta CEO 批评两家高估值 AI 公司以封闭方式开发软件，可能导致权力集中、缩小公众获取渠道。开源权重辩论从技术路线升格为平台政治与价值观对线。</p>
+          <div class="meta">
+            <span class="src">IT之家 / NYT</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/982/847.htm" target="_blank" rel="noopener noreferrer">
+          <h3>OpenAI 研究员盛赞 AMD × Cerebras 联合推理方案</h3>
+          <p>Wccftech 援引 OpenAI 研究员评价，称 AMD 与 Cerebras 面向超低延迟推理的联合方案表现「令人难以置信」。在 CUDA 护城河舆论承压背景下，异构推理栈的「可感知性能」叙事继续加码。</p>
+          <div class="meta">
+            <span class="src">IT之家 / Wccftech</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/982/838.htm" target="_blank" rel="noopener noreferrer">
+          <h3>GitHub Copilot 接入 Grok 4.5；Grok 上线 Build 模式</h3>
+          <p>SpaceXAI 宣布 Grok 4.5 入驻 Copilot（云智能体 / CLI / VS Code）；同日 Grok 推出 Build 模式，可用提示词生成带独立域名的产品（面向高阶订阅）。编程助手多模型货架再添一家。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/982/826.htm" target="_blank" rel="noopener noreferrer">
+          <h3>美国 FCC 禁止进口新的外国产人形机器人与电力逆变器</h3>
+          <p>路透社报道，FCC 宣布禁止尚未获准销售的新型外国产人形/四足机器人及联网电力逆变器进入美国市场，措施立即生效，理由涉及 AI 基础设施与关键供应链安全。具身硬件出海合规门槛抬升。</p>
+          <div class="meta">
+            <span class="src">IT之家 / 路透社</span>
+            <span>2026-07-29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/07/28/cyera-agrees-to-acquire-oasis-security-for-1b-to-safeguard-proliferating-ai-agents/" target="_blank" rel="noopener noreferrer">
+          <h3>Cyera 约 10 亿美元收购 Oasis：盯紧扩散中的 AI Agent</h3>
+          <p>数据安全公司 Cyera 同意以约 10 亿美元收购 Oasis Security，强化对激增 AI Agent 的防护，系其年内第三起收购。安全创业叙事正从「防数据泄露」扩到「防代理层失控」。</p>
+          <div class="meta">
+            <span class="src">TechCrunch</span>
+            <span>2026-07-28</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/07/28/data-centers-may-face-temporary-power-cuts-to-prevent-blackouts-on-largest-us-grid/" target="_blank" rel="noopener noreferrer">
+          <h3>美国最大电网：数据中心或面临临时限电以防大停电</h3>
+          <p>TechCrunch 报道，数据中心建设狂奔下，电网运营商考虑对数据中心实施临时电力削减，以避免最大电网黑灯。算力扩张的约束项从芯片交付进一步外溢到电力调度政治。</p>
+          <div class="meta">
+            <span class="src">TechCrunch</span>
+            <span>2026-07-28</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/982/797.htm" target="_blank" rel="noopener noreferrer">
+          <h3>SK 海力士 Q2 净利同比大增，但未达市场 AI 预期</h3>
+          <p>SK 海力士公布 2026 财年二季度归母净利润约 93.82 万亿韩元、同比大增；Bloomberg / Yahoo 称仍不及投资者对 AI 存储的乐观定价。韩股方面，36 氪快讯指 KOSPI 走弱、海力士跌幅靠前。</p>
+          <div class="meta">
+            <span class="src">IT之家 / Bloomberg</span>
+            <span>2026-07-28 / 29</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="today">
+      <div class="section-head">
+        <span class="tag mk" aria-hidden="true"></span>
+        <h2>今日看点 / 行情摘要</h2>
+      </div>
+      <div class="highlights">
+        <p style="margin:0;color:var(--ink-soft);line-height:1.65;">
+          <strong style="color:var(--ink);">看点：</strong>Agent 安全事故与「国际刹车」联名信把治理推上台面；国内硬件从光模块定价、800VDC 供电到具身传感融资多点开花；软件侧 Harness 开源与 K3 开源余波并行。
+        </p>
+        <ul>
+          <li><strong>安全与治理：</strong>失控 Agent、Altman 谈减速、千人联名、扎克伯格批权力集中——同一 24 小时内，实验室事故与政治叙事互相强化。</li>
+          <li><strong>硬件链：</strong>中际旭创澄清 1.6T 降价传闻、MLCC/800VDC 景气叙事延续；AMD 盘中大跌对照「异构推理被点赞」的舆论反差。</li>
+          <li><strong>软件与产品：</strong>Qoder Better Harness、Copilot×Grok、Cyera 收购 Oasis，工具链竞争从模型本身转向 Agent 评测、多模型接入与安全并购。</li>
+        </ul>
+        <div class="quotes" aria-label="公开行情摘录">
+          <div class="quote">
+            <div class="sym">NASDAQ · NVDA</div>
+            <div class="px">$197.01</div>
+            <div class="chg up">约 +0.25%（较前收）</div>
+          </div>
+          <div class="quote">
+            <div class="sym">NASDAQ · AMD</div>
+            <div class="px">$454.62</div>
+            <div class="chg down">约 −8.15%（较前收）</div>
+          </div>
+          <div class="quote">
+            <div class="sym">NASDAQ · AAPL</div>
+            <div class="px">$340.08</div>
+            <div class="chg up">约 +0.94%（较前收）</div>
+          </div>
+        </div>
+        <p style="margin:0.95rem 0 0;font-size:0.85rem;color:var(--muted);">
+          行情说明：MSFT 约 $393.35（约 +1.09%）；GOOGL 约 $333.71（约 +2.19%）；TSM 约 $392.31（约 −1.70%）；AVGO 约 $380.91（约 −0.60%）；SMCI 约 $28.45（约 −4.56%）。A 股方面，财新开盘快讯称沪指报 3823.29 点、涨约 0.26%；韩股快讯指 KOSPI 走弱、SK 海力士跌幅扩大。另据财新，英伟达 CDS 波动与 AI 基建循环融资引发债市讨论。数据来自 Yahoo Finance 公开接口、财新与 36 氪快讯，采集时点可能滞后，仅供参考，不构成投资建议。
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <p><strong>采集说明：</strong>本报基于公开网页与 RSS（IT之家、36氪及快讯、财新首页可见标题、TechCrunch AI、WIRED AI、BBC Tech、MIT Technology Review、NVIDIA News/Blog、Yahoo Finance、Google News 检索辅助等）整理，时间窗口约 2026-07-28 至 2026-07-29。</p>
+      <p><strong>源可用性：</strong>Hacker News RSS（hnrss.org）本期返回 HTTP 502，已跳过；机器之心 RSS 仍返回 HTML 而非馈送，已跳过；InfoQ 中文 RSS 时效不足，已跳过；The Verge AI topic RSS 近窗条目偏少，未单列强依赖；OpenAI Blog / Anthropic News / Cursor Blog 等官方 RSS 不可用或近窗无稳定更新，相关进展改以 TechCrunch、WIRED、BBC、IT之家为准；财新部分深度稿需订阅，仅采用可公开见标题与链接；部分地方媒体稿件经 Google News 跳转，原文站点可能需二次打开。</p>
+      <p>生成于 2026-07-29 · <a href="./index.html">返回最新一期索引</a> · <a href="./2026-07-28.html">上一期 07-28</a></p>
+    </footer>
+  </div>
+</body>
+</html>
