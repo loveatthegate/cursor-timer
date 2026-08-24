@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026-08-24 · AI 软硬件早报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12202c;
+      --ink-soft: #3a4d5c;
+      --muted: #6b7c8a;
+      --paper: #f3f6f8;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 32, 44, 0.08);
+      --accent: #c45c26;
+      --accent-2: #1f6f6a;
+      --hw: #1f6f6a;
+      --sw: #2a5f8f;
+      --os: #8a4b2f;
+      --mk: #b45309;
+      --shadow: 0 18px 50px rgba(18, 32, 44, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(31, 111, 106, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 95% 5%, rgba(196, 92, 38, 0.14), transparent 50%),
+        linear-gradient(180deg, #e8eef2 0%, var(--paper) 35%, #eef2f4 100%);
+      min-height: 100vh;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    header.hero {
+      padding: 1.2rem 0 2rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Newsreader", "Noto Sans SC", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .date-pill {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lede {
+      margin: 1rem 0 0;
+      max-width: 44rem;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s ease 0.08s both;
+    }
+
+    nav.toc a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--line);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    nav.toc a:hover { transform: translateY(-1px); background: #fff; }
+
+    section.block {
+      margin-top: 1.75rem;
+      animation: rise 0.75s ease both;
+    }
+
+    section.block:nth-of-type(1) { animation-delay: 0.12s; }
+    section.block:nth-of-type(2) { animation-delay: 0.18s; }
+    section.block:nth-of-type(3) { animation-delay: 0.24s; }
+    section.block:nth-of-type(4) { animation-delay: 0.3s; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tag {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tag.hw { background: var(--hw); }
+    .tag.sw { background: var(--sw); }
+    .tag.os { background: var(--os); }
+    .tag.mk { background: var(--mk); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      border-left: 3px solid transparent;
+    }
+
+    a.card.hw { border-left-color: var(--hw); }
+    a.card.sw { border-left-color: var(--sw); }
+    a.card.os { border-left-color: var(--os); }
+
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(18, 32, 44, 0.14);
+      box-shadow: 0 22px 55px rgba(18, 32, 44, 0.12);
+    }
+
+    a.card:focus-visible {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 3px;
+    }
+
+    a.card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    a.card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta .src { font-weight: 600; color: var(--ink-soft); }
+    .meta .link-hint { margin-left: auto; color: var(--accent); font-weight: 600; }
+
+    .highlights {
+      background: linear-gradient(135deg, rgba(31,111,106,0.08), rgba(196,92,38,0.08));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+
+    .highlights ul {
+      margin: 0.7rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    .highlights li { margin-bottom: 0.45rem; }
+    .highlights strong { color: var(--ink); font-weight: 650; }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .quotes { grid-template-columns: 1fr; }
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+    }
+
+    .quote .sym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .quote .px {
+      margin-top: 0.25rem;
+      font-family: "Newsreader", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .quote .chg { font-size: 0.82rem; margin-top: 0.15rem; }
+    .chg.up { color: #0f7a4a; }
+    .chg.down { color: #b42318; }
+
+    footer {
+      margin-top: 2.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.65;
+      animation: rise 0.8s ease 0.35s both;
+    }
+
+    footer a { color: var(--sw); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand-row">
+        <h1 class="brand">AI 软硬件<span>早报</span></h1>
+        <div class="date-pill">2026年8月24日 · 周一</div>
+      </div>
+      <p class="lede">开盘第一天：阿里配售约 800 亿港元「全投 AI」；人形运动会继续出成绩；海外则是 Hugging Face 传售、海力士下一代 HBM 封装，以及英伟达服务器涨价传闻的亚太跟进报道。</p>
+      <nav class="toc" aria-label="栏目导航">
+        <a href="#cn-hw">国内硬件</a>
+        <a href="#cn-sw">国内软件</a>
+        <a href="#overseas">海外动态</a>
+        <a href="#today">今日看点 / 行情</a>
+      </nav>
+    </header>
+
+    <section class="block" id="cn-hw">
+      <div class="section-head">
+        <span class="tag hw" aria-hidden="true"></span>
+        <h2>国内硬件</h2>
+      </div>
+      <div class="grid">
+        <a class="card hw" href="https://www.ithome.com/0/993/348.htm" target="_blank" rel="noopener noreferrer">
+          <h3>人形机器人运动会跳远：天骄队跳出 7.97 米夺冠</h3>
+          <p>央视新闻称 8 月 23 日晚跳远决赛中，天骄队以 7.97 米摘金。运动会从短跑破纪录，延伸到跳远等田径项目，具身智能赛场化继续加码。</p>
+          <div class="meta">
+            <span class="src">IT之家 / 央视新闻</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/0/993/363.htm" target="_blank" rel="noopener noreferrer">
+          <h3>东南大学力交互腔镜手术机器人：跨 2400 公里完成 3 例手术</h3>
+          <p>学校联合企业研发的手术机器人具备接近人手的精细力觉感知，在郑州与新疆团队协同下完成两例肾部分切除与一例前列腺癌根治。国产手术机器人从「能操作」走向远程力反馈临床验证。</p>
+          <div class="meta">
+            <span class="src">IT之家 / 东南大学</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/0/993/353.htm" target="_blank" rel="noopener noreferrer">
+          <h3>联想 × 海尔战略合作：AI PC 算力对接智慧家庭场景</h3>
+          <p>双方上周在北京签约，强调推动算力与场景融合、AI 赋能实体经济。端侧 AI PC 叙事继续向家电与家庭场景延伸，硬件入口争夺进入「客厅 + 书房」组合。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://www.nbd.com.cn/articles/2026-08-23/4551512.html" target="_blank" rel="noopener noreferrer">
+          <h3>WRC 观察：人形仍是主角，食品产线更吃「不会走」的垂类机器人</h3>
+          <p>每经现场报道称，约六成依赖人工的食品加工产线，正被固定工位、高可靠的垂类机器人重构；展商从 demo 展示转向产业落地。具身智能热潮之外，工业场景在用「少自由度」换量产确定性。</p>
+          <div class="meta">
+            <span class="src">每日经济新闻</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/0/993/344.htm" target="_blank" rel="noopener noreferrer">
+          <h3>天工团队回应「捂脸跑」夺冠：跑姿非模仿，属自主涌现</h3>
+          <p>400 米小型组中，天工以捂脸跑姿 45.66 秒夺冠后引发热议；团队称并非找人示范学来。运动控制与强化学习的「怪姿势」现象，成为运动会传播的意外看点。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card hw" href="https://www.solidot.org/story?sid=85169" target="_blank" rel="noopener noreferrer">
+          <h3>Solidot：机器人短跑已超人类，但「刹住」仍是难题</h3>
+          <p>对运动会短跑破纪录成绩的技术点评指出，高速后的制动与稳定仍是工程瓶颈。赛场纪录之外，真实落地仍卡在动力学与安全停机。</p>
+          <div class="meta">
+            <span class="src">Solidot</span>
+            <span>近窗口</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="cn-sw">
+      <div class="section-head">
+        <span class="tag sw" aria-hidden="true"></span>
+        <h2>国内软件</h2>
+      </div>
+      <div class="grid">
+        <a class="card sw" href="https://m.21jingji.com/article/20260824/herald/51a6188a0979235c3063c1e085bfacf4.html" target="_blank" rel="noopener noreferrer">
+          <h3>阿里港股配售约 800 亿港元：净额 100% 投全栈 AI</h3>
+          <p>21 世纪经济报道称，按 112.70 港元/股配售 7.1 亿股新股，预计 8 月 26 日完成；阿里官方同步声明所得将用于扩展 AI 基础设施与全栈能力。国内互联网巨头用「一级市场再融资」直接加码算力与模型军备。</p>
+          <div class="meta">
+            <span class="src">21 财经 / 阿里官方</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://www.alibabagroup.com/zh-HK/document-2028246284372017152" target="_blank" rel="noopener noreferrer">
+          <h3>阿里官方：配售旨在巩固全球 AI 领先地位</h3>
+          <p>集团 8 月 23 日公告拟向美国境外非美人士配售新股，强调 100% 净收益投入全栈 AI（含基础设施升级）。与业绩后股价承压形成对照：短期稀释换长期算力与模型投入。</p>
+          <div class="meta">
+            <span class="src">Alibaba Group</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://techcrunch.com/2026/08/23/whos-behind-the-new-stealth-model-ox-alpha/" target="_blank" rel="noopener noreferrer">
+          <h3>神秘模型 Ox Alpha 上架 OpenRouter：编码 / Agent 向「隐身」预览</h3>
+          <p>TechCrunch 称该免费推理模型被描述为面向 coding 与持续 agentic 工作负载，提供方匿名；坊间一度指向中国 GLM / Z.ai，亦有微软 MAI 猜测。每经早参同步以「牛来」模型热议跟进国产侧猜想。</p>
+          <div class="meta">
+            <span class="src">TechCrunch / 每经</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://www.nbd.com.cn/articles/2026-08-23/4551644.html" target="_blank" rel="noopener noreferrer">
+          <h3>市场速览：阿里配售投 AI，与固态电池、3D 打印等并列重大事件</h3>
+          <p>每经「影响市场重大事件」将阿里 800 亿港元配售列为开盘关注点，强调资金全部投入 AI 建设。资本开支叙事从财报电话会，进入可交易的股本事件。</p>
+          <div class="meta">
+            <span class="src">每日经济新闻</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card sw" href="https://weekly.caixin.com/2026-08-23/102477186.html" target="_blank" rel="noopener noreferrer">
+          <h3>财新周刊导播：AI 基建争东南亚、聪明钱调仓、L3 冲线</h3>
+          <p>导读称东南亚算力容量已超 4.4GW，电力成出海瓶颈；半导体与科技硬件约占标普 500 总市值约三成。国内媒体视角把「出海算力 + 自动驾驶量产」并列为本周产业主线。</p>
+          <div class="meta">
+            <span class="src">财新周刊</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="overseas">
+      <div class="section-head">
+        <span class="tag os" aria-hidden="true"></span>
+        <h2>海外动态</h2>
+      </div>
+      <div class="grid">
+        <a class="card os" href="https://siliconangle.com/2026/08/23/report-ai-model-hub-hugging-face-exploring-sale-at-13b-valuation/" target="_blank" rel="noopener noreferrer">
+          <h3>消息称 Hugging Face 探索出售，估值或达 130 亿美元</h3>
+          <p>Business Insider 援引知情人士称公司已请投行试探买家，谈判仍早；2023 年融资估值约 45 亿美元。开源模型 Hub 若易主，将牵动全球开发者生态与云厂商开源战略。</p>
+          <div class="meta">
+            <span class="src">SiliconANGLE / IT之家</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/993/345.htm" target="_blank" rel="noopener noreferrer">
+          <h3>SK 海力士 Hot Chips：下一代 HBM 引入英特尔 EMIB，瞄准 3D 封装</h3>
+          <p>公司展示 HBM4 规格与混合键合、I-HBM 等路线，以应对散热与带宽瓶颈。内存涨价周期中，先进封装成为 HBM 供给与能效的下一战场。</p>
+          <div class="meta">
+            <span class="src">IT之家 / SK 海力士</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.taipeitimes.com/News/biz/archives/2026/08/24/2003862999" target="_blank" rel="noopener noreferrer">
+          <h3>亚太跟进：英伟达 AI 相关服务器涨价传闻，内存厂话语权上升</h3>
+          <p>《台北时报》转述彭博社称，含 Vera Rubin / Grace Blackwell 的系统明年出货价在许多情形下上调超 15%。继周末 IT之家转述后，周一亚太财经媒体继续扩散「内存驱动整机涨价」叙事。</p>
+          <div class="meta">
+            <span class="src">Taipei Times / Bloomberg</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://money.udn.com/money/story/5612/9709607" target="_blank" rel="noopener noreferrer">
+          <h3>经济日报道：仁宝传拿下 Google 两款 TPU 服务器 L10/L11 大单</h3>
+          <p>称 Zebrafish / Sunfish 等 TPU 相关组装有望明年起量，并瞄准明年 AI 服务器营收占比 30%–40%。自研 ASIC 服务器供应链继续向台系代工扩散。</p>
+          <div class="meta">
+            <span class="src">经济日报</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ajupress.com/view/20260823175224125" target="_blank" rel="noopener noreferrer">
+          <h3>黄仁勋会晤韩国 Rebellions：推理芯片「替代叙事」遇龙头接触</h3>
+          <p>Aju Press 确认双方近日会面；彭博社此前称议题或涉技术合作、投资乃至收购。推理市场「非英伟达」玩家与 incumbent 同场谈判，行业边界更模糊。</p>
+          <div class="meta">
+            <span class="src">Aju Press</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/993/333.htm" target="_blank" rel="noopener noreferrer">
+          <h3>奥尔特曼：担心 AI 被少数强势主体掌控</h3>
+          <p>OpenAI CEO 在播客中称，亦担心 AI 挣脱人类控制；并认为对后者的恐惧可能催生前者集中化。治理辩论从「模型能力」切回「权力结构」。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/993/336.htm" target="_blank" rel="noopener noreferrer">
+          <h3>得州州长阿博特：民众反对 AI 数据中心「咎由自取」</h3>
+          <p>称行业忽视社区对电价、噪音与环境的担忧；盖洛普调查显示约七成美国人反对本地建 AI 数据中心。算力扩张的社会许可，成为北美基建硬约束。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/993/326.htm" target="_blank" rel="noopener noreferrer">
+          <h3>Twitch 因主播内容训练亚马逊 AI 遭集体诉讼</h3>
+          <p>加州诉讼指控未经充分授权使用主播内容，并质疑退出机制。平台 UGC 训练权争议，从音乐/书籍扩展到直播生态。</p>
+          <div class="meta">
+            <span class="src">IT之家</span>
+            <span>2026-08-24</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/0/993/305.htm" target="_blank" rel="noopener noreferrer">
+          <h3>OpenAI 勒汉恩：公众与企业需为 AI 网络攻击做好防御</h3>
+          <p>《卫报》报道称其警告前沿模型已具备规划复杂网络攻击的能力；同期公司暂停部分内部先进模型相关活动。安全叙事与产品发布继续同周共振。</p>
+          <div class="meta">
+            <span class="src">IT之家 / The Guardian</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/08/23/is-it-legal-to-train-ai-models-on-copyrighted-books-its-complicated/" target="_blank" rel="noopener noreferrer">
+          <h3>TechCrunch：用受版权图书训练 AI，法律仍「很复杂」</h3>
+          <p>长文梳理作者不知情贡献语料与合理使用争议。版权诉讼长尾，继续构成大模型训练数据的合规不确定性。</p>
+          <div class="meta">
+            <span class="src">TechCrunch</span>
+            <span>2026-08-23</span>
+            <span class="link-hint">原文 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="today">
+      <div class="section-head">
+        <span class="tag mk" aria-hidden="true"></span>
+        <h2>今日看点 / 行情摘要</h2>
+      </div>
+      <div class="highlights">
+        <p style="margin:0;color:var(--ink-soft);line-height:1.65;">
+          <strong style="color:var(--ink);">看点：</strong>周一主线切换为「融资 + 赛场 + 内存封装」。阿里用约 800 亿港元配售把全栈 AI 资本开支显性化；国内硬件继续围着人形运动会与手术/工业机器人；海外则是 Hugging Face 传售与 HBM 先进封装，叠加上周英伟达服务器涨价传闻的亚太扩散。美股周一仍休市后的首个完整交易日前，美股报价仍以 8 月 21 日收盘为准；A/H 已开盘回吐。
+        </p>
+        <ul>
+          <li><strong>资本：</strong>阿里配售定价约 112.70 港元，净额拟全投 AI 基建与全栈能力；开盘相关科技/机器人股偏弱。</li>
+          <li><strong>硬件：</strong>运动会跳远夺冠 + 手术机器人远程临床；海力士 HBM 封装与仁宝 TPU 代工传闻强化「互联/代工」链条。</li>
+          <li><strong>软件 / 平台：</strong>Ox Alpha 隐身预览扰动开源路由生态；Hugging Face 若出售将重塑模型分发中枢。</li>
+        </ul>
+        <div class="quotes" aria-label="公开行情摘录">
+          <div class="quote">
+            <div class="sym">HKEX · 0700 腾讯</div>
+            <div class="px">HK$443.20</div>
+            <div class="chg down">约 −3.02%（较前收）</div>
+          </div>
+          <div class="quote">
+            <div class="sym">SSE · 688256 寒武纪</div>
+            <div class="px">¥999.30</div>
+            <div class="chg down">约 −3.45%（较前收）</div>
+          </div>
+          <div class="quote">
+            <div class="sym">HKEX · 9880 优必选</div>
+            <div class="px">HK$81.05</div>
+            <div class="chg down">约 −3.40%（较前收）</div>
+          </div>
+        </div>
+        <p style="margin:0.95rem 0 0;font-size:0.85rem;color:var(--muted);">
+          公开行情摘录（Yahoo Finance）：A/H 最近交易日约 2026-08-24 — 中芯国际 0981.HK ≈ HK$70.15（−3.24%），科大讯飞 002230.SZ ≈ ¥39.01（−0.46%）；每经快讯称港股机器人股走低，速腾聚创（02498.HK）盘中跌超 10%。美股 AI 硬件仍为 2026-08-21 收盘：NVDA ≈ $214.72（−0.98%），AMD ≈ $473.25（+0.81%），AVGO ≈ $368.45（+1.21%），SMCI ≈ $37.24（+2.03%），TSM ≈ $418.95（+0.71%），CRWV ≈ $87.85（−2.13%）。涨跌可能滞后，仅供参考，不构成投资建议。
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <p><strong>采集说明：</strong>本报基于公开网页与 RSS（IT之家、TechCrunch AI、The Verge AI、WIRED AI、BBC Tech、NVIDIA News、AMD IR、Solidot、MIT Technology Review、财新、每经、经济日报、Yahoo Finance 等）整理，时间窗口约 2026-08-23 至 2026-08-24（覆盖最近约 24–36 小时）。</p>
+      <p><strong>源可用性：</strong>36氪主站 <code>/feed</code> 仍常为挑战页，未用；OpenAI / Anthropic 官网易 403，相关动态以 TechCrunch、IT之家、卫报转述为准；Bloomberg / Reuters 直链不稳定（服务器涨价以 Taipei Times / Tom's Hardware / 每经转述）；NVIDIA 官方 RSS、AMD IR、WIRED AI、The Verge AI、MIT Technology Review 近 24 小时无更强增量硬新闻单列；Caixin Global <code>/tech/</code> 路径不可用；机器之心 RSS、The Information 付费墙未用；hnrss 未依赖。阿里配售以 21 财经与阿里集团公告交叉核对。</p>
+      <p>生成于 2026-08-24 · <a href="./index.html">返回最新一期索引</a> · <a href="./2026-08-23.html">上一期 08-23</a></p>
+    </footer>
+  </div>
+</body>
+</html>
