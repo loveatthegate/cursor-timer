@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026-09-15 · AI 软硬件早报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12202c;
+      --ink-soft: #3a4d5c;
+      --muted: #6b7c8a;
+      --paper: #f3f6f8;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 32, 44, 0.08);
+      --accent: #c45c26;
+      --accent-2: #1f6f6a;
+      --hw: #1f6f6a;
+      --sw: #2a5f8f;
+      --os: #8a4b2f;
+      --mk: #b45309;
+      --shadow: 0 18px 50px rgba(18, 32, 44, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(31, 111, 106, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 95% 5%, rgba(196, 92, 38, 0.14), transparent 50%),
+        linear-gradient(180deg, #e8eef2 0%, var(--paper) 35%, #eef2f4 100%);
+      min-height: 100vh;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    header.hero {
+      padding: 1.2rem 0 2rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Newsreader", "Noto Sans SC", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .date-pill {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lede {
+      margin: 1rem 0 0;
+      max-width: 44rem;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s ease 0.08s both;
+    }
+
+    nav.toc a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--line);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    nav.toc a:hover { transform: translateY(-1px); background: #fff; }
+
+    section.block {
+      margin-top: 1.75rem;
+      animation: rise 0.75s ease both;
+    }
+
+    section.block:nth-of-type(1) { animation-delay: 0.12s; }
+    section.block:nth-of-type(2) { animation-delay: 0.18s; }
+    section.block:nth-of-type(3) { animation-delay: 0.24s; }
+    section.block:nth-of-type(4) { animation-delay: 0.3s; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tag {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tag.hw { background: var(--hw); }
+    .tag.sw { background: var(--sw); }
+    .tag.os { background: var(--os); }
+    .tag.mk { background: var(--mk); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      border-left: 3px solid transparent;
+    }
+
+    a.card.hw { border-left-color: var(--hw); }
+    a.card.sw { border-left-color: var(--sw); }
+    a.card.os { border-left-color: var(--os); }
+
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(18, 32, 44, 0.14);
+      box-shadow: 0 22px 55px rgba(18, 32, 44, 0.12);
+    }
+
+    a.card:focus-visible {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 3px;
+    }
+
+    a.card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    a.card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta .src { font-weight: 600; color: var(--ink-soft); }
+    .meta .link-hint { margin-left: auto; color: var(--accent); font-weight: 600; }
+
+    .highlights {
+      background: linear-gradient(135deg, rgba(31,111,106,0.08), rgba(196,92,38,0.08));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+
+    .highlights ul {
+      margin: 0.7rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    .highlights li { margin-bottom: 0.45rem; }
+    .highlights strong { color: var(--ink); font-weight: 650; }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .quotes { grid-template-columns: 1fr; }
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+    }
+
+    .quote .sym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .quote .px {
+      margin-top: 0.25rem;
+      font-family: "Newsreader", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .quote .chg { font-size: 0.82rem; margin-top: 0.15rem; }
+    .chg.up { color: #0f7a4a; }
+    .chg.down { color: #b42318; }
+
+    footer {
+      margin-top: 2.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.65;
+      animation: rise 0.8s ease 0.35s both;
+    }
+
+    footer a { color: var(--sw); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand-row">
+        <h1 class="brand">AI 软硬件<span>早报</span></h1>
+        <div class="date-pill">2026-09-15 · 星期二</div>
+      </div>
+      <p class="lede">周二主线从「要不要放缓」切到「市场怎么定价」：美股周一费城半导体暴跌近 6%，A 股光模块巨头市值一日蒸发近千亿；黄仁勋当着特朗普的面说「不会让放缓发生」，OpenAI 则砸约 3 亿美元买下手机影像初创。国内侧工信部「十五五」点名先进制程与高端芯片，DeepSeek 迎来高瓴背景 90 后 CFO，算力网与液冷交付同步升温。</p>
+      <nav class="toc" aria-label="栏目导航">
+        <a href="#hw">国内硬件</a>
+        <a href="#sw">国内软件</a>
+        <a href="#os">海外动态</a>
+        <a href="#today">今日看点 / 行情</a>
+      </nav>
+    </header>
+
+    <section class="block" id="hw">
+      <div class="section-head">
+        <span class="tag hw" aria-hidden="true"></span>
+        <h2>国内硬件</h2>
+      </div>
+      <div class="grid">
+        <a class="card hw" href="https://www.ithome.com/1/002/403.htm" target="_blank" rel="noopener">
+          <h3>工信部、发改委印发电子信息制造业「十五五」规划：提高先进制程，突破高端手机 / PC 芯片</h3>
+          <p>两部委联合印发规划，锚定新型工业化，提出提高先进制程能力，突破高端手机核心芯片与 PC 高性能芯片，并加强开源鸿蒙等国产操作系统搭载。目标指向 2030 年前电子信息制造业营收与长板技术再上台阶，国产算力与整机供应链政策信号明确。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://finance.eastmoney.com/a/202609143873556490.html" target="_blank" rel="noopener">
+          <h3>AI「口头放缓」冲击硬件链：A 股光模块三巨头市值单日蒸发近千亿</h3>
+          <p>周末 Anthropic / OpenAI / xAI 放缓表态后，周一亚股存储与 A 股光通信、存储板块齐跌；中际旭创、新易盛、东山精密等龙头领跌，三巨头市值合计蒸发近千亿。业内指出目前仍无资本开支下调实锤，更多是情绪定价，国产算力与推理迁移中长期逻辑未被证伪。</p>
+          <div class="meta"><span class="src">东方财富 / 第一财经</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.21jingji.com/article/20260914/herald/890525512070818b469e3c641067fc06.html" target="_blank" rel="noopener">
+          <h3>国常会部署算力网：合理布局、高效流转、激活市场</h3>
+          <p>国务院常务会议研究算力网建设，强调完善基础设施与关键装备、推进算电协同与骨干光纤、更好发挥市场机制促进供需匹配。专家解读为「建什么—怎么连—靠什么运转」三层递进，全国一体化算力网从扩容转向调度与绿电协同。</p>
+          <div class="meta"><span class="src">21 世纪经济报道</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.21jingji.com/article/20260915/herald/913649d0828cbc392a9b6c591746b8e7.html" target="_blank" rel="noopener">
+          <h3>英伟达 VR200 机柜进入规模化出货，液冷从试点走向批量交付</h3>
+          <p>浙商证券等研报称三季度是液冷从试点到批量交付的拐点，核心驱动为英伟达 VR200 机柜规模化出货；国内新建智算项目已普遍将液冷标配，政策 PUE 约束继续倒逼风冷改造。算力配套赛道中，冷板式与浸没式液冷分工进一步清晰。</p>
+          <div class="meta"><span class="src">21 世纪经济报道</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://news.mydrivers.com/1/1150/1150911.htm" target="_blank" rel="noopener">
+          <h3>沐曦曦云 C700 功能验证接近完成，性能对标英伟达 H100</h3>
+          <p>沐曦半年度业绩说明会披露，下一代旗舰 GPU 曦云 C700 核心设计与功能验证接近完成，下一步推进流片、软件适配与量产导入；基于国产先进工艺，并强化供应链自主可控。前代 C600 已量产，国产训练卡迭代节奏继续加快。</p>
+          <div class="meta"><span class="src">快科技</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/1/002/375.htm" target="_blank" rel="noopener">
+          <h3>AI-eSIM 团体标准编制启动，三大运营商参与</h3>
+          <p>2026 信息通信行业 6G+ 人工智能创新发展研讨会上，AI-eSIM 团体标准编制启动，中国移动 / 联通 / 电信参与。eSIM 与端侧 AI 能力结合，意在为终端身份、模型分发与运营商 AI 服务提供规范化接口。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/1/002/372.htm" target="_blank" rel="noopener">
+          <h3>台积电产能吃紧：高通与三星重启 2nm 代工谈判</h3>
+          <p>受台积电产能不足与苹果锁定大量 2nm 产能影响，高通据报与三星重启先进制程代工磋商，骁龙 8 Elite Gen 6 或走双代工，报价仍有分歧。先进制程供给紧张继续外溢到手机 SoC 与 AI 端侧芯片节奏。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.nbd.com.cn/articles/2026-09-14/4581395.html" target="_blank" rel="noopener">
+          <h3>行云科技：在手 5 年期算力框架订单超 160 亿元</h3>
+          <p>每经报道，行云科技（300209）披露截至 9 月 8 日在手五年期算力长期框架订单约 160.04 亿元。算力「卖铲人」订单能见度上升，亦折射国内智算采购仍在扩张，与海外「口头放缓」情绪形成对照。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="sw">
+      <div class="section-head">
+        <span class="tag sw" aria-hidden="true"></span>
+        <h2>国内软件</h2>
+      </div>
+      <div class="grid">
+        <a class="card sw" href="https://news.pedaily.cn/202609/568994.shtml" target="_blank" rel="noopener">
+          <h3>DeepSeek 锁定 CFO 人选：高瓴创投 90 后合伙人严文韬</h3>
+          <p>投资界称圈内传闻落地，梁文锋团队新任 CFO 大概率来自高瓴创投 90 后合伙人严文韬，岗位「虽未完全到位」但已被多方默认；严文韬据报曾参与智谱、MiniMax 等投资。公司在模型迭代之外补齐资本与上市班底。</p>
+          <div class="meta"><span class="src">投资界</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.nbd.com.cn/articles/2026-09-14/4580561.html" target="_blank" rel="noopener">
+          <h3>中国大模型调用量连续二十周领跑，DeepSeek V4.1 Flash 上线三日升至第六</h3>
+          <p>每经依据 OpenRouter 数据测算：上周全球调用约 127 万亿 Token；中国上榜模型周调用约 61.17 万亿，连续二十周超过美国。DeepSeek V4.1 Flash 上线仅三天升至全球第六，腾讯混元 Hy4 preview 等亦占据前列。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.nbd.com.cn/articles/2026-09-14/4580653.html" target="_blank" rel="noopener">
+          <h3>每经热评：AI 巨头「放缓」是真对齐，还是真卷不动了？</h3>
+          <p>评论梳理 Anthropic 风险报告与 Altman / Musk 响应后的产业疑问：安全倡议与资本开支、IPO 时间表之间存在张力。对国内厂商而言，更需区分「口头节奏」与真实算力 / 推理需求曲线。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.ithome.com/1/002/373.htm" target="_blank" rel="noopener">
+          <h3>联想来酷斗战者 AI NAS 900 开售：飞牛 fnOS，6999 元起</h3>
+          <p>联想来酷斗战者 AI 私有云主机正式开售，搭载飞牛 fnOS，入门款 Ultra 7 + 16GB 售价 6999 元起。端侧 / 家庭与小团队私有化部署继续产品化，AI NAS 成为消费与 SMB 硬件新入口。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://news.mydrivers.com/1/1150/1150935.htm" target="_blank" rel="noopener">
+          <h3>全球首个：国家药监局发布人工智能 + 脑机接口医疗器械标准</h3>
+          <p>新标准为全球首个采用 AI 处理脑电数据的脑机接口医疗器械产品标准，规范采集、处理、标注、存储与访问全流程，将于明年 9 月 1 日实施。AI 与具身 / 神经接口的合规底座开始成型。</p>
+          <div class="meta"><span class="src">快科技</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://finance.eastmoney.com/a/202609153874064821.html" target="_blank" rel="noopener">
+          <h3>券商晨会：国产替代逻辑明确，继续聚焦光模块两大主线</h3>
+          <p>财联社晨会精华援引中信等观点，强调 CIOE 之后光互联国产替代与 800G / 1.6T 到 NPO/CPO 梯队落地；尽管周一情绪冲击明显，卖方仍将光模块视为 AI 算力链业绩兑现较充分环节。</p>
+          <div class="meta"><span class="src">东方财富 / 财联社</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="os">
+      <div class="section-head">
+        <span class="tag os" aria-hidden="true"></span>
+        <h2>海外动态</h2>
+      </div>
+      <div class="grid">
+        <a class="card os" href="https://techcrunch.com/2026/09/14/nvidia-ceo-jensen-huang-tells-trump-were-not-going-to-let-an-ai-slowdown-happen/" target="_blank" rel="noopener">
+          <h3>黄仁勋当着特朗普的面：我们不会让 AI「放缓」发生</h3>
+          <p>All-In Summit 上，英伟达 CEO 在台上接听特朗普来电并表态不会放任 AI 发展放缓；与周末 Amodei / Altman / Musk 的限速同频形成对冲。算力供给侧旗帜鲜明地站在「继续扩建」一侧。</p>
+          <div class="meta"><span class="src">TechCrunch / The Verge</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.nbd.com.cn/articles/2026-09-15/4581510.html" target="_blank" rel="noopener">
+          <h3>特朗普抨击 Anthropic CEO：AI 不能踩刹车；费城半导体指数跌约 5.9%</h3>
+          <p>每经全球科技早参：特朗普称 AI「唯一护栏」是强势总统，反对放缓；芯片股集体下挫，费城半导体指数跌约 5.9%，英伟达、博通、超微电脑等重挫，网络安全股则逆势上涨。政策立场与估值杀估值同日兑现。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/09/14/openai-buys-smartphone-camera-maker-glass-imaging-for-300-million-report-says/" target="_blank" rel="noopener">
+          <h3>OpenAI 据报约 3 亿美元收购手机影像公司 Glass Imaging</h3>
+          <p>Wall Street Journal / TechCrunch：Glass Imaging 由前苹果工程师创办，影像技术已用于荣耀等手机；交易后估值报道超过 3 亿美元。OpenAI 在模型之外继续补齐端侧视觉与成像能力。</p>
+          <div class="meta"><span class="src">TechCrunch / IT之家</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/002/405.htm" target="_blank" rel="noopener">
+          <h3>谷歌放开内部政策：全体工程师可用 Anthropic Claude</h3>
+          <p>Business Insider 称谷歌已向全公司工程师开放 Claude，作为 Gemini 补充；此前多数场景要求使用自家模型。大厂「自研优先」松绑，反映编码助手竞争白热化。</p>
+          <div class="meta"><span class="src">IT之家 / BI</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/002/409.htm" target="_blank" rel="noopener">
+          <h3>白宫科技顾问批 Anthropic 与 OpenAI：自己做安全产品，别总想政府干预</h3>
+          <p>总统科技顾问委员会联合主席戴维·萨克斯接受采访称，头部 AI 公司应自建安全产品并按自身节奏推进，而非一味寻求政府介入。华盛顿把「放缓」球踢回企业侧。</p>
+          <div class="meta"><span class="src">IT之家 / 彭博</span><span>2026-09-15</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/002/365.htm" target="_blank" rel="noopener">
+          <h3>Claude Opus 5.2 灰度曝光：更快，少「偷懒」</h3>
+          <p>开发者反馈 Opus 5.2 已在 Claude Code 等渠道灰度，响应速度提升、长任务「摸鱼」减少；亦有内部更强后续模型传闻。Anthropic 一边喊限速，一边继续推高产品能力。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.theverge.com/news/994566/microsoft-humanist-ai-code-of-conduct" target="_blank" rel="noopener">
+          <h3>微软发布「人本主义」AI 行为准则：人比 AI 更重要</h3>
+          <p>微软公布约 37 页准则，要求模型不协助武器与危险物质、不形成自身目标、不篡改思维链记录等，并向外征求意见。大厂把对齐从口号落成可审计的产品规范。</p>
+          <div class="meta"><span class="src">The Verge / TechCrunch</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://nvidianews.nvidia.com/news/nvidia-expands-open-source-cuda-q-platform-for-fault-tolerant-quantum-computing" target="_blank" rel="noopener">
+          <h3>英伟达扩展开源 CUDA-Q：面向容错量子计算</h3>
+          <p>NVIDIA 宣布 CUDA-Q 新增 Logical 编排层，帮助研究者在算法、纠错码与硬件架构之间快速切换并验证容错量子应用。经典加速器厂商继续向量子—AI 交叉工具链延伸。</p>
+          <div class="meta"><span class="src">NVIDIA Newsroom</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.wired.com/story/ai-leaders-are-calling-for-a-slowdown-trumps-team-says-its-on-them/" target="_blank" rel="noopener">
+          <h3>WIRED：AI 领袖呼吁放缓，特朗普团队回应「责任在你们」</h3>
+          <p>在 Altman、Musk 呼应 Amodei 之后，白宫科技圈表态更倾向企业自律而非联邦急刹车。安全辩论从周末公开信进入工作日的监管甩锅与市场定价阶段。</p>
+          <div class="meta"><span class="src">WIRED</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.theverge.com/ai-artificial-intelligence/995186/is-big-techs-ai-slowdown-a-safety-pact-or-a-cartel" target="_blank" rel="noopener">
+          <h3>The Verge：大厂 AI「放缓」是安全公约，还是卡特尔？</h3>
+          <p>评论质疑前沿实验室同步限速是否可能滑向协调减产；安全话语与竞争合规边界变得模糊。市场用芯片股暴跌给出了自己的解读。</p>
+          <div class="meta"><span class="src">The Verge</span><span>2026-09-14</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="today">
+      <div class="section-head">
+        <span class="tag mk" aria-hidden="true"></span>
+        <h2>今日看点 / 行情摘要</h2>
+      </div>
+      <div class="highlights">
+        <ul>
+          <li><strong>硬件主线：</strong>「十五五」点名先进制程与高端芯片；国常会部署算力网；VR200 液冷规模化出货；光模块情绪杀估值；沐曦 C700 接近流片。</li>
+          <li><strong>软件主线：</strong>DeepSeek 迎高瓴背景 CFO；中国模型调用量连续二十周领先，V4.1 Flash 迅速爬升；AI + 脑机接口标准落地。</li>
+          <li><strong>海外主线：</strong>黄仁勋 / 特朗普 vs Amodei 限速阵营；SOX 大跌；OpenAI 买 Glass Imaging；谷歌放开 Claude；微软发行为准则。</li>
+          <li><strong>行情：</strong>美股周一半导体板块重挫（SOX −5.86%）；港股 / A 股周二交易中，腾讯反弹、寒武纪走强，中芯与优必选回调。</li>
+          <li><strong>风险提示：</strong>公开行情仅供参考，非投资建议；IPO / 融资 / 标准实施节点以官方披露为准。</li>
+        </ul>
+        <div class="quotes" aria-label="公开行情摘录">
+          <div class="quote"><div class="sym">NVDA · 美股</div><div class="px">$210.96</div><div class="chg down">−3.36% · 09-14</div></div>
+          <div class="quote"><div class="sym">AMD · 美股</div><div class="px">$493.41</div><div class="chg down">−4.40% · 09-14</div></div>
+          <div class="quote"><div class="sym">AVGO · 美股</div><div class="px">$344.72</div><div class="chg down">−4.77% · 09-14</div></div>
+          <div class="quote"><div class="sym">TSM · 美股</div><div class="px">$418.01</div><div class="chg down">−3.52% · 09-14</div></div>
+          <div class="quote"><div class="sym">SMCI · 美股</div><div class="px">$36.74</div><div class="chg down">−8.38% · 09-14</div></div>
+          <div class="quote"><div class="sym">CRWV · 美股</div><div class="px">$82.98</div><div class="chg down">−6.75% · 09-14</div></div>
+          <div class="quote"><div class="sym">SOX · 费城半导体</div><div class="px">11131</div><div class="chg down">−5.86% · 09-14</div></div>
+          <div class="quote"><div class="sym">纳斯达克</div><div class="px">26186</div><div class="chg down">−0.56% · 09-14</div></div>
+          <div class="quote"><div class="sym">0700.HK · 腾讯</div><div class="px">HK$439.20</div><div class="chg up">+2.00% · 09-15</div></div>
+          <div class="quote"><div class="sym">0981.HK · 中芯</div><div class="px">HK$61.05</div><div class="chg down">−0.41% · 09-15</div></div>
+          <div class="quote"><div class="sym">9880.HK · 优必选</div><div class="px">HK$78.05</div><div class="chg down">−1.08% · 09-15</div></div>
+          <div class="quote"><div class="sym">688256.SS · 寒武纪</div><div class="px">¥1063.05</div><div class="chg up">+2.22% · 09-15</div></div>
+          <div class="quote"><div class="sym">002230.SZ · 科大讯飞</div><div class="px">¥39.48</div><div class="chg down">−0.30% · 09-15</div></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>采集窗口约 2026-09-14 02:00 UTC → 2026-09-15 02:15 UTC。行情来自 Yahoo Finance chart 日线：美股为 09-14 收盘；港股 / A 股为 09-15 交易日最新日线（采集时或为盘中 / 收盘前快照）。</p>
+      <p>主要来源：IT之家 RSS、快科技、21 世纪经济报道、东方财富、每日经济新闻、投资界、TechCrunch AI RSS、The Verge AI Atom、WIRED AI RSS、NVIDIA Newsroom、Yahoo Finance。</p>
+      <p>跳过 / 受限：CNBC Tech RSS Access Denied；Solidot / 快科技 RSS 部分 403；36氪挑战页；Reuters / Bloomberg 付费墙；Google News 仅作发现、正文以出版社页面为准；OpenAI / Anthropic 官网近窗稀疏。</p>
+      <p>本页为公开资讯汇编，非投资建议。归档：<a href="./index.html">daily-ai-brief/index.html</a></p>
+    </footer>
+  </div>
+</body>
+</html>
