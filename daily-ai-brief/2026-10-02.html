@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026-10-02 · AI 软硬件早报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12202c;
+      --ink-soft: #3a4d5c;
+      --muted: #6b7c8a;
+      --paper: #f3f6f8;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 32, 44, 0.08);
+      --accent: #c45c26;
+      --accent-2: #1f6f6a;
+      --hw: #1f6f6a;
+      --sw: #2a5f8f;
+      --os: #8a4b2f;
+      --mk: #b45309;
+      --shadow: 0 18px 50px rgba(18, 32, 44, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(31, 111, 106, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 95% 5%, rgba(196, 92, 38, 0.14), transparent 50%),
+        linear-gradient(180deg, #e8eef2 0%, var(--paper) 35%, #eef2f4 100%);
+      min-height: 100vh;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    header.hero {
+      padding: 1.2rem 0 2rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Newsreader", "Noto Sans SC", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .date-pill {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lede {
+      margin: 1rem 0 0;
+      max-width: 44rem;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s ease 0.08s both;
+    }
+
+    nav.toc a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--line);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    nav.toc a:hover { transform: translateY(-1px); background: #fff; }
+
+    section.block {
+      margin-top: 1.75rem;
+      animation: rise 0.75s ease both;
+    }
+
+    section.block:nth-of-type(1) { animation-delay: 0.12s; }
+    section.block:nth-of-type(2) { animation-delay: 0.18s; }
+    section.block:nth-of-type(3) { animation-delay: 0.24s; }
+    section.block:nth-of-type(4) { animation-delay: 0.3s; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tag {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tag.hw { background: var(--hw); }
+    .tag.sw { background: var(--sw); }
+    .tag.os { background: var(--os); }
+    .tag.mk { background: var(--mk); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      border-left: 3px solid transparent;
+    }
+
+    a.card.hw { border-left-color: var(--hw); }
+    a.card.sw { border-left-color: var(--sw); }
+    a.card.os { border-left-color: var(--os); }
+
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(18, 32, 44, 0.14);
+      box-shadow: 0 22px 55px rgba(18, 32, 44, 0.12);
+    }
+
+    a.card:focus-visible {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 3px;
+    }
+
+    a.card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    a.card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta .src { font-weight: 600; color: var(--ink-soft); }
+    .meta .link-hint { margin-left: auto; color: var(--accent); font-weight: 600; }
+
+    .highlights {
+      background: linear-gradient(135deg, rgba(31,111,106,0.08), rgba(196,92,38,0.08));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+
+    .highlights ul {
+      margin: 0.7rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    .highlights li { margin-bottom: 0.45rem; }
+    .highlights strong { color: var(--ink); font-weight: 650; }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .quotes { grid-template-columns: 1fr; }
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+    }
+
+    .quote .sym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .quote .px {
+      margin-top: 0.25rem;
+      font-family: "Newsreader", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .quote .chg { font-size: 0.82rem; margin-top: 0.15rem; }
+    .chg.up { color: #0f7a4a; }
+    .chg.down { color: #b42318; }
+    .chg.flat { color: var(--muted); }
+
+    footer {
+      margin-top: 2.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.65;
+      animation: rise 0.8s ease 0.35s both;
+    }
+
+    footer a { color: var(--sw); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand-row">
+        <h1 class="brand">AI 软硬件<span>早报</span></h1>
+        <div class="date-pill">2026-10-02 · 星期五 · 国庆</div>
+      </div>
+      <p class="lede">华为 Mate 90 全系上「τ」旗舰芯片，昇腾 950 液冷超节点落户上海；海外侧谷歌首颗先进芯片上天试跑太空算力，Anthropic 冲刺感恩节前 IPO，埃森哲靠 AI 订单单日暴涨。</p>
+      <nav class="toc" aria-label="栏目导航">
+        <a href="#hw">国内硬件</a>
+        <a href="#sw">国内软件</a>
+        <a href="#os">海外动态</a>
+        <a href="#today">今日看点 / 行情</a>
+      </nav>
+    </header>
+
+    <section class="block" id="hw">
+      <div class="section-head">
+        <span class="tag hw" aria-hidden="true"></span>
+        <h2>国内硬件</h2>
+      </div>
+      <div class="grid">
+        <a class="card hw" href="https://www.nbd.com.cn/articles/2026-10-01/4596460.html" target="_blank" rel="noopener">
+          <h3>华为 Mate 90 全系搭载旗舰 τ 芯片，麒麟迎更大规模商用</h3>
+          <p>10 月 1 日发布并开售，余承东宣布全系搭载旗舰 τ 芯片，「逻辑折叠」从三折叠下放至出货量更大的 Mate 直板旗舰。鸿蒙 6/7 终端已破 9000 万台；存储成本上行与高端竞争仍是背景约束。</p>
+          <div class="meta"><span class="src">每经网 / 东方财富 / IT之家</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://finance.eastmoney.com/a/202610013888006044.html" target="_blank" rel="noopener">
+          <h3>昇腾 950 液冷超节点落户上海青浦：1024 卡组「超级计算机」</h3>
+          <p>东财称全球首个昇腾 950 液冷超节点入驻云湖智算中心，1024 张芯片经高速网络组成可商用超节点，服务长三角高密度算力。同期上海推进电力「安芯」工程，点出 AI 对电能质量的刚性需求。</p>
+          <div class="meta"><span class="src">东方财富</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://finance.eastmoney.com/a/202610023888305415.html" target="_blank" rel="noopener">
+          <h3>智元灵犀 X2 进店卖锅：100 台人形机器人 3 天销约 223 万元</h3>
+          <p>9 月 28 日起百台「爱宝」入驻全国 100 家爱仕达门店导购，试营业 3 天累计销售约 223 万元、门店均增约 39%。国庆假期继续上岗，人形从展厅演示走向零售场景。</p>
+          <div class="meta"><span class="src">东方财富</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://finance.eastmoney.com/a/202610013888192352.html" target="_blank" rel="noopener">
+          <h3>美光 CEO：HBM 需求增速跑赢传统 DRAM 或延续至 2028</h3>
+          <p>财报电话会称结构性供需缺口难见拐点，2027 年 HBM 大部分供应已签约且价格同比大涨。存储紧缺叙事从 DRAM/NAND 合约价延伸到 HBM 长协锁定。</p>
+          <div class="meta"><span class="src">东方财富</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://finance.eastmoney.com/a/202610023888318695.html" target="_blank" rel="noopener">
+          <h3>美股光通信 / 存储集体走强：Lumentum、美光等领涨</h3>
+          <p>10 月 1 日美股收盘，Coherent 涨超 10%，Ciena、Lumentum 涨超 7%，SK 海力士 ADR 涨超 5%，美光涨超 3%；英伟达涨 1.09% 创 5 月中旬来收盘新高。光模块与存储交易情绪同步升温。</p>
+          <div class="meta"><span class="src">东方财富</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/1/009/196.htm" target="_blank" rel="noopener">
+          <h3>马斯克：为 Optimus 量产，拟砍半 AI5 / AI6 芯片内存</h3>
+          <p>称要为机器人量产腾出 DRAM 配额。背景仍是美光等强调人形单机超 200GB 内存需求——「物理 AI」正在反过来挤压车端芯片的内存预算。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://finance.eastmoney.com/a/202610013888256729.html" target="_blank" rel="noopener">
+          <h3>寒武纪前高管索赔调整至约 278 亿元，公司称尚未开庭</h3>
+          <p>原副总经理梁军将股权激励损失主张从约 42.87 亿元上调至 278.32 亿元；寒武纪称案件处送达阶段、金额仅为单方主张。国产 AI 芯片龙头治理与激励纠纷再上热搜。</p>
+          <div class="meta"><span class="src">东方财富</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/1/009/161.htm" target="_blank" rel="noopener">
+          <h3>惠普战 99 锐龙版 AI 工作站发布：最高 R9-9955HX3D + RTX PRO</h3>
+          <p>面向移动工作站场景，配置覆盖 RTX PRO 500 至更高规格，定价约 1.46 万–2.2 万元档。国庆档继续有「本地 AI PC / 工作站」新品补充端侧算力供给。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="sw">
+      <div class="section-head">
+        <span class="tag sw" aria-hidden="true"></span>
+        <h2>国内软件</h2>
+      </div>
+      <div class="grid">
+        <a class="card sw" href="https://www.ithome.com/1/009/222.htm" target="_blank" rel="noopener">
+          <h3>腾讯 WorkBuddy：Hy3 限免与 Hy4 preview 夜间限免延至 10/31</h3>
+          <p>9 月 30 日晚宣布两项限免同步延期到月底，继续用低门槛窗口拉新与留存。国庆期间大厂 Agent / 编程助手仍以「免费额度续命」争夺开发者时长。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.nbd.com.cn/articles/2026-10-01/4596460.html" target="_blank" rel="noopener">
+          <h3>Mate 90 + HarmonyOS 7：鸿蒙应用与服务超 45 万</h3>
+          <p>每经指出终端数破 9000 万的同时，软件生态仍是把芯片迭代转化为体验的关键。国产生态在端侧 AI、多设备协同上继续加注，与海外 Agent 手机叙事形成对照。</p>
+          <div class="meta"><span class="src">每经网</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://finance.eastmoney.com/a/202609303887878820.html" target="_blank" rel="noopener">
+          <h3>（延续）DeepSeek 开源昇腾全套组件：对标 CUDA 工具链</h3>
+          <p>覆盖 TileLang 昇腾版、计算库与分布式通信库。叠加热点昇腾 950 超节点落地，国产「芯片 + 软件栈」闭环叙事在国庆窗口仍被反复引用。</p>
+          <div class="meta"><span class="src">东方财富</span><span>2026-09-30</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.ithome.com/1/009/212.htm" target="_blank" rel="noopener">
+          <h3>微软预热 10/7 Surface 开发者场：本地 AI 重塑下一代 PC</h3>
+          <p>太平洋时间 10 月 7 日线上举行，英伟达黄仁勋将出席。端侧 NPU/GPU 与 Windows 本地推理继续是软硬件协同主战场，对国内 AI PC 供应链亦有风向意义。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="os">
+      <div class="section-head">
+        <span class="tag os" aria-hidden="true"></span>
+        <h2>海外动态</h2>
+      </div>
+      <div class="grid">
+        <a class="card os" href="https://techcrunch.com/2026/10/01/google-thinks-spacexs-starship-has-to-launch-1600-times-before-space-data-centers-get-off-the-ground/" target="_blank" rel="noopener">
+          <h3>谷歌首颗先进芯片上天：「太阳捕手」试跑太空数据中心</h3>
+          <p>搭乘 SpaceX、由 Planet Labs 造星，验证 Tensor 处理器在轨供电、散热与模型运行。白皮书估算需约 1800 次星舰发射，太空算力从概念进入工程原型阶段。</p>
+          <div class="meta"><span class="src">TechCrunch / IT之家</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3782894" target="_blank" rel="noopener">
+          <h3>Anthropic 冲刺感恩节前 IPO：估值讨论至 1.8–2 万亿美元</h3>
+          <p>据报道最快 11 月路演、争取 11 月 26 日前上市，10 月 14 日办 Pre-IPO 投资者日。见闻另文强调招股书中约 5180 亿美元云/算力义务，是「先把未来算力买下」的极端版本。</p>
+          <div class="meta"><span class="src">华尔街见闻</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3782893" target="_blank" rel="noopener">
+          <h3>埃森哲季报超预期：AI 订单推手，股价一度涨超 20%</h3>
+          <p>Q4 营收与新签均超指引，本财年营收指引均值约 +4.5% 高于街预期；CEO 称客户正建数据底座与 AI 能力。IT 咨询股集体走强，市场重新定价「卖铲人」落地收入。</p>
+          <div class="meta"><span class="src">华尔街见闻 / 每经网</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/10/01/chatgpt-can-now-virtually-try-on-clothes-for-you/" target="_blank" rel="noopener">
+          <h3>ChatGPT 上线虚拟试穿：用自拍试衣并可收藏商品</h3>
+          <p>全球推开试穿与 Favorites，基于近期 ChatGPT Images 2.5。OpenAI 继续把对话入口做成购物履约层，与国内超级 App Agent 抢同一条「决策到下单」链路。</p>
+          <div class="meta"><span class="src">TechCrunch / IT之家</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.bbc.co.uk/news/articles/c6y9z9r4ejzwo" target="_blank" rel="noopener">
+          <h3>OpenAI 与三名安全研究人员解约：涉敏感信息处理</h3>
+          <p>BBC / WSJ / TechCrunch 称其绕过既定流程、与外部评测组织共享数据。加州检察长同日对 OpenAI 发传票，聚焦 AI 网络安全风险与 Hugging Face 相关事件。</p>
+          <div class="meta"><span class="src">BBC / TechCrunch / IT之家</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3782897" target="_blank" rel="noopener">
+          <h3>微软推 MAI 语音三件套：流式转写 WER 2.5%、延迟约 0.13 秒</h3>
+          <p>MAI-Transcribe-2-Streaming 覆盖 60 语种；MAI-Voice-2.1 / Flash 分打质量与低延迟。Artificial Analysis 榜单居前，云厂商自研语音栈继续降价抢份额。</p>
+          <div class="meta"><span class="src">华尔街见闻 / IT之家</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://blogs.nvidia.com/blog/gpus-openai-gpt-6-astra-ultrafast/" target="_blank" rel="noopener">
+          <h3>NVIDIA：GPT-6 Astra Ultrafast 跑在 Blackwell，主打低延迟推理</h3>
+          <p>官方博客称已在 API 及符合条件的 ChatGPT Work / Codex 用户侧可用，强调代码生成、工具调用与交互场景的加速。推理优化与云端 GPU 绑定仍是卖铲主叙事。</p>
+          <div class="meta"><span class="src">NVIDIA Blog</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/10/01/amazon-releases-its-own-jev-clone-as-decision-models-flood-the-web/" target="_blank" rel="noopener">
+          <h3>AWS Strand Labs 发布 Strands Decider 2B：决策小模型跟风潮</h3>
+          <p>继 OpenAI Decisions API 等「Jev 系」之后，亚马逊给出 2B 级决策模型。Agent 编排需要又快又便宜的「拍板模型」，成为大厂标配件。</p>
+          <div class="meta"><span class="src">TechCrunch</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://techcrunch.com/2026/10/01/shopify-debuts-canvas-a-way-to-build-online-stores-by-chatting-with-ai/" target="_blank" rel="noopener">
+          <h3>Shopify Canvas：与 Sidekick 对话实时搭建网店</h3>
+          <p>商家边聊边看页面变化，把建站从拖拽升级为 Agent 协作。电商基础设施商继续把生成式界面做成默认生产力入口。</p>
+          <div class="meta"><span class="src">TechCrunch</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.theverge.com/ai-artificial-intelligence/1003756/google-gemini-live-guided-vision" target="_blank" rel="noopener">
+          <h3>Gemini Live 推 Guided Vision：摄像头实时读出「细则」</h3>
+          <p>兼容 Android 机型上线，指向相机画面做实时语音讲解。多模态助手从聊天框走向「看世界」；同日法院驳回针对 Google AI Overviews 的两起反垄断诉讼。</p>
+          <div class="meta"><span class="src">The Verge</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3782891" target="_blank" rel="noopener">
+          <h3>存储短缺传导消费电子：三星 Galaxy S26 系列涨价最高 200 美元</h3>
+          <p>美区 S26 / S26+ / Ultra 各配涨 100 美元，Ultra 1TB 顶配 +200 至 1999 美元。AI 服务器抢产能的外部成本，开始出现在旗舰手机标价上。</p>
+          <div class="meta"><span class="src">华尔街见闻</span><span>2026-10-02</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.bbc.co.uk/news/articles/cv8e30enrkxyo" target="_blank" rel="noopener">
+          <h3>英央行行长警告：AI 热潮或触发市场冲击</h3>
+          <p>Andrew Bailey 称正「非常仔细」观察涌入人工智能的资金浪潮。与见闻「指数靠 AI 巨头撑住、广度恶化」的叙事共振，宏观层面对 AI 估值泡沫保持警戒。</p>
+          <div class="meta"><span class="src">BBC / 华尔街见闻</span><span>2026-10-01</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="today">
+      <div class="section-head">
+        <span class="tag mk" aria-hidden="true"></span>
+        <h2>今日看点 / 行情摘要</h2>
+      </div>
+      <div class="highlights">
+        <ul>
+          <li><strong>硬件主线：</strong>华为 Mate 90「τ」芯片 + 昇腾 950 液冷超节点，是国产生态国庆窗口的硬核信号；智元机器人进店验证零售场景。海外存储/光通信交易情绪回暖，马斯克为 Optimus 砍芯片内存，物理 AI 继续改写产能分配。</li>
+          <li><strong>软件主线：</strong>WorkBuddy 限免续命、鸿蒙应用规模再被点名；微软 Surface 本地 AI 场预告黄仁勋出席。海外 ChatGPT 试穿、Shopify Canvas、AWS 决策小模型，显示 Agent 正嵌入购物与建站。</li>
+          <li><strong>海外主线：</strong>谷歌太空算力原型、Anthropic IPO 冲刺、埃森哲 AI 订单爆表是三大增量；OpenAI 人事/传票与英央行警告构成治理与宏观副线。</li>
+          <li><strong>行情：</strong>美股最近全日 10-01 vs 09-30：SOX +1.59%、NVDA +1.09%、MU +3.03%、LITE +7.67%、ACN +15.78%、SMCI +2.07%、CRWV +1.66%；AVGO −2.15%、IXIC +0.04%。港股 10-02 vs 09-30：阿里 −2.72%、腾讯 −1.81%、中芯 −1.32%、优必选 −1.34%。A 股仍国庆休市，寒武纪/讯飞停在 09-30 全日。每经称日韩早盘三星、海力士齐跌。</li>
+          <li><strong>风险提示：</strong>公开行情与未证实产品传闻仅供参考，非投资建议；以官方发布与交易所披露为准。</li>
+        </ul>
+        <div class="quotes" aria-label="公开行情摘录">
+          <div class="quote"><div class="sym">SOX · 费城半导体</div><div class="px">12829</div><div class="chg up">+1.59% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">纳斯达克</div><div class="px">26872</div><div class="chg up">+0.04% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">NVDA · 美股</div><div class="px">$230.86</div><div class="chg up">+1.09% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">MU · 美股</div><div class="px">$1097.39</div><div class="chg up">+3.03% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">ACN · 美股</div><div class="px">$212.30</div><div class="chg up">+15.78% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">LITE · 美股</div><div class="px">$1045.78</div><div class="chg up">+7.67% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">AMD · 美股</div><div class="px">$615.73</div><div class="chg up">+0.65% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">AVGO · 美股</div><div class="px">$343.64</div><div class="chg down">−2.15% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">TSM · 美股</div><div class="px">$459.20</div><div class="chg up">+0.66% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">SMCI · 美股</div><div class="px">$41.92</div><div class="chg up">+2.07% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">CRWV · 美股</div><div class="px">$88.57</div><div class="chg up">+1.66% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">META · 美股</div><div class="px">$725.93</div><div class="chg up">+0.10% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">MSFT · 美股</div><div class="px">$512.80</div><div class="chg flat">−0.02% · 10-01 vs 09-30</div></div>
+          <div class="quote"><div class="sym">9988.HK · 阿里</div><div class="px">HK$103.70</div><div class="chg down">−2.72% · 10-02 vs 09-30</div></div>
+          <div class="quote"><div class="sym">0700.HK · 腾讯</div><div class="px">HK$423.20</div><div class="chg down">−1.81% · 10-02 vs 09-30</div></div>
+          <div class="quote"><div class="sym">0981.HK · 中芯</div><div class="px">HK$59.85</div><div class="chg down">−1.32% · 10-02 vs 09-30</div></div>
+          <div class="quote"><div class="sym">9880.HK · 优必选</div><div class="px">HK$73.35</div><div class="chg down">−1.34% · 10-02 vs 09-30</div></div>
+          <div class="quote"><div class="sym">688256.SS · 寒武纪</div><div class="px">¥1009.01</div><div class="chg down">−3.54% · 09-30 vs 09-29 · 休市</div></div>
+          <div class="quote"><div class="sym">002230.SZ · 科大讯飞</div><div class="px">¥37.22</div><div class="chg up">+0.05% · 09-30 vs 09-29 · 休市</div></div>
+        </div>
+        <p style="margin:0.85rem 0 0;font-size:0.78rem;color:var(--muted);">国庆假期 A 股休市；港股 10-01 休市后于 10-02 交易。公开行情摘录来自 Yahoo Finance，非投资建议。</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>采集窗口约 2026-10-01 02:00 UTC → 2026-10-02 02:15 UTC（周五早报 · 国庆）。美股为 10-01 相对 09-30；港股为 10-02 相对 09-30；A 股仍为 09-30 全日相对 09-29。</p>
+      <p>主要来源：IT之家 RSS、华尔街见闻信息流 / 文章 API、东方财富资讯搜索、每经栏目页、TechCrunch AI RSS、The Verge AI Atom、BBC Tech RSS、WIRED AI RSS、NVIDIA Blog RSS、Yahoo Finance。</p>
+      <p>跳过 / 受限：Anthropic 官网 /news/rss.xml 仍为 Not Found；Google News 跳转无法稳定解出源站；Bloomberg / 部分路透 / CNBC Tech RSS / 36氪 RSS 习惯性跳过；每经首页偶发超时，改用栏目页；每经 / 东财正文页 og 本环境常空，改用页面正文段落；昨日已覆盖的 Gemini 4 Argon、GPT-Synopsys、ElevenLabs、美光产能售罄主叙事、DeepSeek Harness 桌面版等不再重复展开。</p>
+      <p>本页为公开资讯汇编，非投资建议。归档：<a href="./index.html">daily-ai-brief/index.html</a></p>
+    </footer>
+  </div>
+</body>
+</html>
