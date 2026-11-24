@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026-11-24 · AI 软硬件早报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12202c;
+      --ink-soft: #3a4d5c;
+      --muted: #6b7c8a;
+      --paper: #f3f6f8;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 32, 44, 0.08);
+      --accent: #c45c26;
+      --accent-2: #1f6f6a;
+      --hw: #1f6f6a;
+      --sw: #2a5f8f;
+      --os: #8a4b2f;
+      --mk: #b45309;
+      --shadow: 0 18px 50px rgba(18, 32, 44, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Instrument Sans", "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(31, 111, 106, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 95% 5%, rgba(196, 92, 38, 0.14), transparent 50%),
+        linear-gradient(180deg, #e8eef2 0%, var(--paper) 35%, #eef2f4 100%);
+      min-height: 100vh;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 3.5rem;
+    }
+
+    header.hero {
+      padding: 1.2rem 0 2rem;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Newsreader", "Noto Sans SC", serif;
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .date-pill {
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .lede {
+      margin: 1rem 0 0;
+      max-width: 46rem;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s ease 0.08s both;
+    }
+
+    nav.toc a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--line);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    nav.toc a:hover { transform: translateY(-1px); background: #fff; }
+
+    section.block {
+      margin-top: 1.75rem;
+      animation: rise 0.75s ease both;
+    }
+
+    section.block:nth-of-type(1) { animation-delay: 0.12s; }
+    section.block:nth-of-type(2) { animation-delay: 0.18s; }
+    section.block:nth-of-type(3) { animation-delay: 0.24s; }
+    section.block:nth-of-type(4) { animation-delay: 0.3s; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .tag {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tag.hw { background: var(--hw); }
+    .tag.sw { background: var(--sw); }
+    .tag.os { background: var(--os); }
+    .tag.mk { background: var(--mk); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.15rem 1rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      border-top: 3px solid transparent;
+    }
+
+    a.card.hw { border-top-color: var(--hw); }
+    a.card.sw { border-top-color: var(--sw); }
+    a.card.os { border-top-color: var(--os); }
+
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(18, 32, 44, 0.14);
+      box-shadow: 0 22px 56px rgba(18, 32, 44, 0.12);
+    }
+
+    a.card h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1.02rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    a.card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.93rem;
+      line-height: 1.62;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      margin-top: 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .meta .src { font-weight: 600; color: var(--ink-soft); }
+    .meta .link-hint { margin-left: auto; color: var(--accent); font-weight: 600; }
+
+    .highlights {
+      background: linear-gradient(135deg, rgba(31,111,106,0.08), rgba(196,92,38,0.08));
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+
+    .highlights ul {
+      margin: 0.7rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+
+    .highlights li { margin-bottom: 0.45rem; }
+    .highlights strong { color: var(--ink); font-weight: 650; }
+
+    .quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .quotes { grid-template-columns: 1fr; }
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+    }
+
+    .quote .sym {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .quote .px {
+      margin-top: 0.25rem;
+      font-family: "Newsreader", serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+    }
+
+    .quote .chg { font-size: 0.82rem; margin-top: 0.15rem; }
+    .chg.up { color: #0f7a4a; }
+    .chg.down { color: #b42318; }
+    .chg.flat { color: var(--muted); }
+
+    footer {
+      margin-top: 2.4rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.65;
+      animation: rise 0.8s ease 0.35s both;
+    }
+
+    footer a { color: var(--sw); }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand-row">
+        <h1 class="brand">AI 软硬件<span>早报</span></h1>
+        <div class="date-pill">2026-11-24 · 星期二</div>
+      </div>
+      <p class="lede">周一美股被「黄仁勋复职」点燃：英伟达约涨 31%、芯片指数约涨 14%，亚太周二跟涨。产业侧同时落地 Anthropic 代码 Agent「Claude Ship」、OpenAI GPT-6.2 Sol 全量上 ChatGPT，以及国内算力订单与三星西安 AI 存储扩产。治理线则有公安部 AI 造谣案例与美方拟将亚洲算力中间商列入黑名单。</p>
+      <nav class="toc" aria-label="栏目导航">
+        <a href="#hw">国内硬件</a>
+        <a href="#sw">国内软件</a>
+        <a href="#os">海外动态</a>
+        <a href="#today">今日看点 / 行情</a>
+      </nav>
+    </header>
+
+    <section class="block" id="hw">
+      <div class="section-head">
+        <span class="tag hw" aria-hidden="true"></span>
+        <h2>国内硬件</h2>
+      </div>
+      <div class="grid">
+        <a class="card hw" href="https://www.ithome.com/1/031/258.htm" target="_blank" rel="noopener">
+          <h3>三星拟扩西安 NAND：V9 产线瞄准 AI 数据中心 eSSD</h3>
+          <p>韩媒称计划把陕西西安工厂打造成面向 AI 数据中心的企业级 SSD 核心基地，重点扩大第九代 V-NAND（约 286 层）产能，设备预计 2027 年 2 月进场。外资存力继续加码「中国制造 + 全球 AI 客户」双轨。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.nbd.com.cn/articles/2026-11-23/4656463.html" target="_blank" rel="noopener">
+          <h3>行云科技再签近 3 亿元算力服务单，年内订单称超 200 亿</h3>
+          <p>公告披露与北京豆神智算签署协议，提供 32 套标准化 GPU 算力技术服务。二级市场「算力订单」叙事回暖，但需对照交付节奏与毛利质量。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.nbd.com.cn/articles/2026-11-23/4656433.html" target="_blank" rel="noopener">
+          <h3>蜂助手斩获约 16.64 亿元算力服务器设备大单</h3>
+          <p>公司与 E 公司签署算力服务器采购合同，将分批交付设备。硬件集成商订单弹性仍大，股价年内跌幅与大单预期形成对比，兑现期是关键。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://news.pedaily.cn/202611/572259.shtml" target="_blank" rel="noopener">
+          <h3>诚锋科技完成 B+ 轮：半导体 / 光通信视觉检测加码</h3>
+          <p>老股东追加，资金用于核心技术迭代、产能扩张与全球拓展。先进封装与光模块良率检测继续吸收一级市场弹药。</p>
+          <div class="meta"><span class="src">投资界</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://news.pedaily.cn/202611/572265.shtml" target="_blank" rel="noopener">
+          <h3>声镭科技完成 Pre-A：先进封装无损检测赛道融资</h3>
+          <p>本轮用于技术研发、产能与市场拓展。封装检测与光通信视觉检测同属「AI 基建质检」细分，与算力扩产节奏共振。</p>
+          <div class="meta"><span class="src">投资界</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/1/031/269.htm" target="_blank" rel="noopener">
+          <h3>前 10 月数据服务业用电增速超 40%，全社会用电 +3.7%</h3>
+          <p>电力数据侧面印证互联网 / 数据中心负荷仍在抬升。算力扩张不只体现在 GPU 出货，也落在电网与能耗统计上。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://news.pedaily.cn/202611/572248.shtml" target="_blank" rel="noopener">
+          <h3>傲意科技完成 D 轮：具身智能商业化再融资</h3>
+          <p>中兵顺景等联合投资，称将夯实产业链站位并加速商业化。物理 AI / 机器人融资线在二级题材走强后继续获一级确认。</p>
+          <div class="meta"><span class="src">投资界</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card hw" href="https://www.ithome.com/1/031/273.htm" target="_blank" rel="noopener">
+          <h3>消息称三星 2029 年存储产能近售罄，客户抢到 2031</h3>
+          <p>韩媒称 2027–2029 大部分产能已合约锁定，部分客户争取延至 2031，或涉及预付款与长约定价。AI 存力短缺叙事从「明年缺货」拉长到「数年合约」。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="sw">
+      <div class="section-head">
+        <span class="tag sw" aria-hidden="true"></span>
+        <h2>国内软件</h2>
+      </div>
+      <div class="grid">
+        <a class="card sw" href="https://www.nbd.com.cn/articles/2026-11-23/4656036.html" target="_blank" rel="noopener">
+          <h3>智谱 GLM-5.4 上线，并推出 Coding Plan 订阅体系</h3>
+          <p>每经数智早参与 IT 早报同步提及：模型迭代叠代码订阅产品化。国内大模型厂商继续把「编程 Agent」做成可计费套餐，对标海外 Claude / Codex 订阅战。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.ithome.com/1/031/261.htm" target="_blank" rel="noopener">
+          <h3>公安部网安局公布 10 起 AI 造谣典型案例，「净网-2026」半年查处 190 余人</h3>
+          <p>覆盖灾情谣言、假冒公职人员等类型；称上半年全国查处 AI 造谣案 170 余起。应用侧治理从平台公约升级到执法公示，生成式内容风控仍是国内主线。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.ithome.com/1/031/276.htm" target="_blank" rel="noopener">
+          <h3>余承东：鸿蒙终端设备数突破一亿，称越过规模临界点</h3>
+          <p>终端 BG 董事长发文宣布生态里程碑。对 AI 手机 / 星芒等产品线意味着分发底座更厚，也是国产 OS 与端侧 AI 叙事的关键节点。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://news.pedaily.cn/202611/572262.shtml" target="_blank" rel="noopener">
+          <h3>DeepSeek 限额、腾讯与豆包抢「榜一」：打工人被绕晕</h3>
+          <p>投资界观察：免费额度收紧叠加各厂 Agent 战绩宣传，职场用户在多模型切换中承受体验成本。C 端「免费无限」窗口收窄，产品竞争更像订阅与场景占位。</p>
+          <div class="meta"><span class="src">投资界</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.nbd.com.cn/articles/2026-11-24/4656813.html" target="_blank" rel="noopener">
+          <h3>港股科技反弹：恒生科技高开超 2%，AI 概念股跟涨</h3>
+          <p>受美股芯片股暴涨外溢，恒指 / 恒科指开盘走强，AI 相关标的全线活跃。国内二级市场情绪更多是「外盘风险偏好修复」而非新基本面突变。</p>
+          <div class="meta"><span class="src">每日经济新闻</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card sw" href="https://www.ithome.com/1/031/228.htm" target="_blank" rel="noopener">
+          <h3>华为星芒确认 OSTA 将推全场景产品，小平板传闻升温</h3>
+          <p>品牌总经理刘赫表态「手机只是开始」。AI 原生鸿蒙终端从单机走向平板等形态，软件生态与端侧模型分发值得跟踪。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="os">
+      <div class="section-head">
+        <span class="tag os" aria-hidden="true"></span>
+        <h2>海外动态</h2>
+      </div>
+      <div class="grid">
+        <a class="card os" href="https://wallstreetcn.com/articles/3786536" target="_blank" rel="noopener">
+          <h3>英伟达董事会恢复黄仁勋 CEO 职务，股价约涨 31%、市值单日增近万亿</h3>
+          <p>官网宣布复职后空头回补与风险偏好骤升；见闻称市值一日增加约 9520 亿美元。治理动荡结束成为本轮科技股反弹的核心催化剂，亚洲周二跟涨。</p>
+          <div class="meta"><span class="src">华尔街见闻</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.wired.com/story/jensen-huang-is-back-as-nvidia-ceo/" target="_blank" rel="noopener">
+          <h3>WIRED：Jensen Huang 重返英伟达 CEO</h3>
+          <p>英媒与科技媒体确认董事会一致表决恢复其总裁、CEO 及董事职务。白宫公开表态「介入促成」令公司治理与政治外溢同时升温。</p>
+          <div class="meta"><span class="src">WIRED</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3786547" target="_blank" rel="noopener">
+          <h3>Anthropic：企业可自持 AI 数据密钥，Claude Ship 同步上线</h3>
+          <p>EFS 公测允许企业把交互数据放自有云并自持加密钥；Claude Ship 加入 PR Steward / Approvals 等代码协作 Agent。数据主权与「自动合入代码」同日推进。</p>
+          <div class="meta"><span class="src">华尔街见闻</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.theverge.com/ai-artificial-intelligence/1040134/anthropic-claude-ship-ai-pull-requests" target="_blank" rel="noopener">
+          <h3>The Verge：Claude 可自行审查 PR 并推送修复</h3>
+          <p>Claude Ship Beta 把审查、冲突处理与审批做成 Agent 流水线，企业可设上限。编程入口继续从 IDE 迁向「自动交付」工作流。</p>
+          <div class="meta"><span class="src">The Verge</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/031/271.htm" target="_blank" rel="noopener">
+          <h3>OpenAI：GPT-6.2 Sol 登陆 ChatGPT；5.6 Sol / Terra 将于 12 月 23 日退役</h3>
+          <p>新模型面向日常对话与图像 / 检索增强，已向订阅用户推送；旧模型退役意在释放算力。ChatGPT 主模型节奏继续「高频换代 + 关旧省算力」。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3786545" target="_blank" rel="noopener">
+          <h3>马斯克承认 SpaceX AI 研发落后：出租算力比自研 Grok 更赚钱</h3>
+          <p>称 Anthropic、谷歌等租用其算力贡献高营收，而自研模型承压。算力「卖铲子」与自研模型之间的利润剪刀差被当事人公开承认。</p>
+          <div class="meta"><span class="src">华尔街见闻</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/031/262.htm" target="_blank" rel="noopener">
+          <h3>亚马逊收购 Decart AI 优化技术，强化 Trainium 等自研芯片竞争力</h3>
+          <p>媒体称交易规模约 75 亿美元量级；DOS 引擎可在多厂商芯片间切换并提速推理。云厂继续用并购补齐软件栈，对冲英伟达生态粘性。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.bbc.co.uk/news/articles/cv98xpg5dg5zo" target="_blank" rel="noopener">
+          <h3>BBC：美国拟将亚洲 AI 公司 Megaspeed 列入黑名单</h3>
+          <p>指控涉向中国转运 AI 芯片等；事件与英伟达治理丑闻外溢交织。算力贸易合规从「调查」升至出口管制工具，中间商模式风险再抬升。</p>
+          <div class="meta"><span class="src">BBC Tech</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/031/282.htm" target="_blank" rel="noopener">
+          <h3>OpenRouter 因提示词 / 密钥外泄清退 3 家服务商</h3>
+          <p>Together AI、Phala、Novita 被撤「零数据保留」资格，125 个端点受影响。API 聚合层安全事件提醒：企业选型不能只看价格与延迟。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.bbc.co.uk/news/articles/cq62pn6j42jko" target="_blank" rel="noopener">
+          <h3>BBC：英伟达市值单日攀升近万亿美元，科技股集体反弹</h3>
+          <p>复职消息推动纳指等大幅收复前一周跌幅。市场把「治理不确定性」快速重新定价为「AI 龙头叙事回笼」。</p>
+          <div class="meta"><span class="src">BBC Tech</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://wallstreetcn.com/articles/3786560" target="_blank" rel="noopener">
+          <h3>亚洲开盘：韩股一度涨 7%，SK 海力士约 +10%，台积电大涨近一成</h3>
+          <p>MSCI 亚太约 +4%；韩国交易所触发程序化买盘暂停机制。美股芯片暴涨的外溢首先打在存储与代工链上。</p>
+          <div class="meta"><span class="src">华尔街见闻</span><span>2026-11-24</span><span class="link-hint">原文 →</span></div>
+        </a>
+        <a class="card os" href="https://www.ithome.com/1/031/232.htm" target="_blank" rel="noopener">
+          <h3>谷歌：多组 Gemini 智能体「开会」优化量子算法，号称最高提速约 290×</h3>
+          <p>DeepMind 与 Quantum AI 联合研究，用多智能体协同加形式化方法缓解计算资源瓶颈。Agent 协作从写代码延伸到科学计算调度。</p>
+          <div class="meta"><span class="src">IT之家</span><span>2026-11-23</span><span class="link-hint">原文 →</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="block" id="today">
+      <div class="section-head">
+        <span class="tag mk" aria-hidden="true"></span>
+        <h2>今日看点 / 行情摘要</h2>
+      </div>
+      <div class="highlights">
+        <ul>
+          <li><strong>硬件主线：</strong>三星西安扩产 AI eSSD、存储长约锁到 2029+；国内行云 / 蜂助手算力订单落地；诚锋 / 声镭等检测与封装环节融资；数据服务业用电高增印证算力负荷。</li>
+          <li><strong>软件主线：</strong>智谱 GLM-5.4 + Coding Plan；公安部公示 AI 造谣执法；鸿蒙破亿与星芒全场景；DeepSeek / 腾讯 / 豆包争夺职场入口。</li>
+          <li><strong>海外主线：</strong>黄仁勋复职引爆 NVDA / SOX；Anthropic 数据主权 + Claude Ship；GPT-6.2 Sol 上线；SpaceX「卖算力」矛盾；亚马逊并购 Decart；Megaspeed 黑名单风险；OpenRouter 清退泄密服务商。</li>
+          <li><strong>今日观察：</strong>亚太能否把美股反弹吃成「收盘涨」而非冲高回落；存储 / 光模块跟涨持续性；Anthropic CEO 减持与企业数据政策对估值的二次冲击；国内算力订单公告的交付兑现。</li>
+          <li><strong>行情：</strong>周二约 02:00 UTC——美股引用周一 11-23 相对周五 11-20（部分标的 Yahoo 收盘价尚未落库，用 regularMarketPrice）：纳指约 +6.51%，SOX 约 +14.03%，NVDA 约 +31.48%，MU 约 +19.04%，CRWV 约 +22.32%，ANT 约 −1.43%。港股 / A 股为周二 11-24 相对周一 11-23（早盘）：优必选约 +7.05%、剑桥科技约 +8.40%、光迅约 +4.79%、寒武纪约 +3.33%、腾讯约 +0.93%。</li>
+          <li><strong>风险提示：</strong>公开行情与产业消息仅供参考，非投资建议；以官方发布与交易所披露为准。个人丑闻细节不作为产业判断依据。</li>
+        </ul>
+        <div class="quotes" aria-label="公开行情摘录">
+          <div class="quote"><div class="sym">纳斯达克 · 周一全日</div><div class="px">24089.56</div><div class="chg up">+6.51% · 11-23 vs 11-20</div></div>
+          <div class="quote"><div class="sym">SOX · 周一全日</div><div class="px">9588.05</div><div class="chg up">+14.03% · 11-23 vs 11-20</div></div>
+          <div class="quote"><div class="sym">NVDA · 美股</div><div class="px">$165.05</div><div class="chg up">+31.48% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">AMD · 美股</div><div class="px">$453.46</div><div class="chg up">+6.85% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">AVGO · 美股</div><div class="px">$313.55</div><div class="chg up">+3.00% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">TSM · 美股</div><div class="px">$363.60</div><div class="chg up">+14.08% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">MU · 美股</div><div class="px">$707.70</div><div class="chg up">+19.04% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">INTC · 美股</div><div class="px">$59.66</div><div class="chg up">+16.34% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">ORCL · 美股</div><div class="px">$113.68</div><div class="chg up">+12.34% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">SMCI · 美股</div><div class="px">$24.53</div><div class="chg up">+13.30% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">CRWV · 美股</div><div class="px">$48.33</div><div class="chg up">+22.32% · 11-23 vs 11-20</div></div>
+          <div class="quote"><div class="sym">DELL · 美股</div><div class="px">$334.91</div><div class="chg up">+20.46% · 11-23 vs 11-20</div></div>
+          <div class="quote"><div class="sym">LITE · 美股</div><div class="px">$544.38</div><div class="chg up">+18.20% · 11-23 vs 11-20</div></div>
+          <div class="quote"><div class="sym">META · 美股</div><div class="px">$597.60</div><div class="chg up">+6.55% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">GOOGL · 美股</div><div class="px">$282.10</div><div class="chg up">+6.34% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">MSFT · 美股</div><div class="px">$492.50</div><div class="chg up">+1.65% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">AMZN · 美股</div><div class="px">$255.39</div><div class="chg up">+3.47% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">AAPL · 美股</div><div class="px">$349.08</div><div class="chg up">+1.90% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">ANT · 美股</div><div class="px">$87.64</div><div class="chg down">−1.43% · 11-23 vs 11-20 · reg</div></div>
+          <div class="quote"><div class="sym">ACN · 美股</div><div class="px">$222.29</div><div class="chg up">+0.51% · 11-23 vs 11-20</div></div>
+          <div class="quote"><div class="sym">0700.HK · 腾讯 · 周二</div><div class="px">HK$347.20</div><div class="chg up">+0.93% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">0981.HK · 中芯 · 周二</div><div class="px">HK$49.46</div><div class="chg up">+1.48% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">9880.HK · 优必选 · 周二</div><div class="px">HK$64.50</div><div class="chg up">+7.05% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">9988.HK · 阿里 · 周二</div><div class="px">HK$84.45</div><div class="chg up">+1.69% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">1810.HK · 小米 · 周二</div><div class="px">HK$27.10</div><div class="chg down">−1.53% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">688256.SS · 寒武纪 · 周二</div><div class="px">¥945.25</div><div class="chg up">+3.33% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">002230.SZ · 科大讯飞 · 周二</div><div class="px">¥36.06</div><div class="chg up">+1.61% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">688041.SS · 海光信息 · 周二</div><div class="px">¥166.50</div><div class="chg up">+1.52% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">603019.SS · 中科曙光 · 周二</div><div class="px">¥75.37</div><div class="chg up">+0.92% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">688825.SS · 长鑫科技 · 周二</div><div class="px">¥37.23</div><div class="chg up">+3.70% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">603083.SS · 剑桥科技 · 周二</div><div class="px">¥108.40</div><div class="chg up">+8.40% · 11-24 vs 11-23</div></div>
+          <div class="quote"><div class="sym">002281.SZ · 光迅科技 · 周二</div><div class="px">¥86.56</div><div class="chg up">+4.79% · 11-24 vs 11-23</div></div>
+        </div>
+        <p style="margin:0.85rem 0 0;font-size:0.78rem;color:var(--muted);">周二凌晨采集：美股引用周一 11-23 相对周五 11-20（Yahoo chart 部分个股 close 尚未写入，标 reg 者用 regularMarketPrice）；港股 / A 股为 11-24 相对 11-23 日线（早盘价，非必然收盘）。公开行情摘录非投资建议。</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>采集窗口约 2026-11-23 02:00 UTC → 2026-11-24 02:15 UTC（周二早报）。</p>
+      <p>主要来源：IT之家 RSS / 正文（高 id 已至 <code>1/031/296</code>）、华尔街见闻信息流与文章 API（api-one-wscn）、投资界新闻页、每日经济新闻栏目页、WIRED AI RSS、BBC Tech RSS、The Verge AI Atom、Yahoo Finance chart；Google News RSS 仅作发现、不直链正文。</p>
+      <p>跳过 / 受限：TechCrunch AI RSS Cloudflare「Attention Required」；Anthropic /news/rss 仍为 Not Found；Google News 不直链正文；Bloomberg / Reuters / CNBC / 36氪 / itjuzi 习惯性跳过或不可用；Yahoo quote v7 Unauthorized（改用 chart）；黄仁勋个人八卦、恶搞直播、种子轮玩笑与上期已覆盖的 ANT 绿鞋主线、FSD v15 评测长文、黎曼猜想炒作等不重复展开；Character.AI / Grok 相关诉讼仅在监管语境略过，不展开敏感细节。</p>
+      <p>本页为公开资讯汇编，非投资建议。归档：<a href="./index.html">daily-ai-brief/index.html</a></p>
+    </footer>
+  </div>
+</body>
+</html>
